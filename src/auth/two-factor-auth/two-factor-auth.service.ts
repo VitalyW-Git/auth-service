@@ -76,7 +76,7 @@ export class TwoFactorAuthService {
 	}
 
 	private async generateTwoFactorToken(email: string) {
-		const token = Math.floor(
+		const token: string = Math.floor(
 			Math.random() * (1000000 - 100000) + 100000
 		).toString()
 		const expiresIn = new Date(new Date().getTime() + 300000)
@@ -97,7 +97,7 @@ export class TwoFactorAuthService {
 			})
 		}
 
-		const twoFactorToken = await this.prismaService.token.create({
+		return await this.prismaService.token.create({
 			data: {
 				email,
 				token,
@@ -105,7 +105,5 @@ export class TwoFactorAuthService {
 				type: TokenType.TWO_FACTOR
 			}
 		})
-
-		return twoFactorToken
-	}
+  }
 }

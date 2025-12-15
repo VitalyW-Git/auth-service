@@ -10,7 +10,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 export class UserService {
 	public constructor(private readonly prismaService: PrismaService) {}
 
-	public async findById(id: string) {
+	public async findById(id: string): Promise<User> {
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				id
@@ -30,7 +30,7 @@ export class UserService {
 	}
 
 	public async findByEmail(email: string): Promise<User> {
-		const user = await this.prismaService.user.findUnique({
+		return await this.prismaService.user.findUnique({
 			where: {
 				email
 			},
@@ -38,9 +38,7 @@ export class UserService {
 				accounts: true
 			}
 		})
-
-		return user
-	}
+  }
 
 	public async create(
 		email: string,
@@ -50,7 +48,7 @@ export class UserService {
 		method: AuthMethod,
 		isVerified: boolean
 	) {
-		const user = await this.prismaService.user.create({
+		return await this.prismaService.user.create({
 			data: {
 				email,
 				password: password ? await hash(password) : '',
@@ -63,14 +61,12 @@ export class UserService {
 				accounts: true
 			}
 		})
-
-		return user
-	}
+  }
 
 	public async update(userId: string, dto: UpdateUserDto) {
 		const user = await this.findById(userId)
 
-		const updatedUser = await this.prismaService.user.update({
+		return await this.prismaService.user.update({
 			where: {
 				id: user.id
 			},
@@ -80,7 +76,5 @@ export class UserService {
 				isTwoFactorEnabled: dto.isTwoFactorEnabled
 			}
 		})
-
-		return updatedUser
-	}
+  }
 }

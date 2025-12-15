@@ -125,7 +125,7 @@ export class PasswordRecoveryService {
 			})
 		}
 
-		const passwordResetToken = await this.prismaService.token.create({
+		return await this.prismaService.token.create({
 			data: {
 				email,
 				token,
@@ -133,7 +133,5 @@ export class PasswordRecoveryService {
 				type: TokenType.PASSWORD_RESET
 			}
 		})
-
-		return passwordResetToken
-	}
+  }
 }

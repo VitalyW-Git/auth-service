@@ -1,5 +1,7 @@
 import {
 	ConflictException,
+	forwardRef,
+	Inject,
 	Injectable,
 	InternalServerErrorException,
 	NotFoundException,
@@ -26,6 +28,7 @@ export class AuthService {
 		private readonly userService: UserService,
 		private readonly configService: ConfigService,
 		private readonly providerService: ProviderService,
+		@Inject(forwardRef(() => EmailConfirmationService))
 		private readonly emailConfirmationService: EmailConfirmationService,
 		private readonly twoFactorAuthService: TwoFactorAuthService
 	) {}

@@ -94,7 +94,6 @@ export class EmailConfirmationService {
 	}
 
 	private async generateVerificationToken(email: string) {
-		const token = uuidv4()
 		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
 		const existingToken = await this.prismaService.token.findFirst({
@@ -116,7 +115,7 @@ export class EmailConfirmationService {
     return await this.prismaService.token.create({
       data: {
         email,
-        token,
+        token: uuidv4(),
         expiresIn,
         type: TokenType.VERIFICATION
       }

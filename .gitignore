@@ -32,7 +32,9 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-base/postgres/data
-base/redis/data
+base/redis/data/*
+!base/redis/data/.gitkeep
+base/postgres/data/*
+!base/postgres/data/.gitkeep
 .idea
 .env
