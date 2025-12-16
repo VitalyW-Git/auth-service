@@ -1,22 +1,29 @@
-import {BadRequestException, forwardRef, Inject, Injectable, Logger, NotFoundException} from '@nestjs/common'
-import {TokenType} from '@prisma/client'
-import {Request} from 'express'
-import {v4 as uuidv4} from 'uuid'
+import { EntityManager } from '@mikro-orm/core'
+import {
+	BadRequestException,
+	forwardRef,
+	Inject,
+	Injectable,
+	Logger,
+	NotFoundException
+} from '@nestjs/common'
+import { Request } from 'express'
+import { v4 as uuidv4 } from 'uuid'
 
-import {MailService} from '@/libs/mail/mail.service'
-import {PrismaService} from '@/prisma/prisma.service'
-import {UserService} from '@/user/user.service'
+import { Token, TokenType, User } from '@/database/entities'
+import { MailService } from '@/libs/mail/mail.service'
+import { UserService } from '@/user/user.service'
 
-import {AuthService} from '../auth.service'
+import { AuthService } from '../auth.service'
 
-import {ConfirmationDto} from './dto/confirmation.dto'
+import { ConfirmationDto } from './dto/confirmation.dto'
 
 @Injectable()
 export class EmailConfirmationService {
 	private readonly logger = new Logger(EmailConfirmationService.name)
 
 	public constructor(
-		private readonly prismaService: PrismaService,
+		private readonly em: EntityManager,
 		private readonly mailService: MailService,
 		private readonly userService: UserService,
 		@Inject(forwardRef(() => AuthService))
@@ -24,11 +31,9 @@ export class EmailConfirmationService {
 	) {}
 
 	public async newVerification(req: Request, dto: ConfirmationDto) {
-		const existingToken = await this.prismaService.token.findUnique({
-			where: {
-				token: dto.token,
-				type: TokenType.VERIFICATION
-			}
+		const existingToken = await this.em.findOne(Token, {
+			token: dto.token,
+			type: TokenType.VERIFICATION
 		})
 
 		if (!existingToken) {
@@ -55,21 +60,9 @@ export class EmailConfirmationService {
 			)
 		}
 
-		await this.prismaService.user.update({
-			where: {
-				id: existingUser.id
-			},
-			data: {
-				isVerified: true
-			}
-		})
-
-		await this.prismaService.token.delete({
-			where: {
-				id: existingToken.id,
-				type: TokenType.VERIFICATION
-			}
-		})
+		existingUser.isVerified = true
+		await this.em.removeAndFlush(existingToken)
+		await this.em.flush()
 
 		return this.authService.saveSession(req, existingUser)
 	}
@@ -77,7 +70,7 @@ export class EmailConfirmationService {
 	public async sendVerificationToken(email: string) {
 		const verificationToken = await this.generateVerificationToken(email)
 
-    console.log(verificationToken)
+		console.log(verificationToken)
 		try {
 			await this.mailService.sendConfirmationEmail(
 				verificationToken.email,
@@ -93,32 +86,27 @@ export class EmailConfirmationService {
 		return true
 	}
 
-	private async generateVerificationToken(email: string) {
+	private async generateVerificationToken(email: string): Promise<Token> {
 		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
-		const existingToken = await this.prismaService.token.findFirst({
-			where: {
-				email,
-				type: TokenType.VERIFICATION
-			}
+		const existingToken = await this.em.findOne(Token, {
+			email,
+			type: TokenType.VERIFICATION
 		})
 
 		if (existingToken) {
-			await this.prismaService.token.delete({
-				where: {
-					id: existingToken.id,
-					type: TokenType.VERIFICATION
-				}
-			})
+			await this.em.removeAndFlush(existingToken)
 		}
 
-    return await this.prismaService.token.create({
-      data: {
-        email,
-        token: uuidv4(),
-        expiresIn,
-        type: TokenType.VERIFICATION
-      }
-    })
+		const token = this.em.create(Token, {
+			email,
+			token: uuidv4(),
+			expiresIn,
+			type: TokenType.VERIFICATION
+		})
+
+		await this.em.persistAndFlush(token)
+
+		return token
 	}
 }

@@ -1,3 +1,4 @@
+import { EntityManager } from '@mikro-orm/core'
 import {
 	ConflictException,
 	forwardRef,
@@ -8,11 +9,10 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { AuthMethod, User } from '@prisma/client'
 import { verify } from 'argon2'
 import { Request, Response } from 'express'
 
-import { PrismaService } from '@/prisma/prisma.service'
+import { Account, AuthMethod, User } from '@/database/entities'
 import { UserService } from '@/user/user.service'
 
 import { LoginDto } from './dto/login.dto'
@@ -24,7 +24,7 @@ import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
 @Injectable()
 export class AuthService {
 	public constructor(
-		private readonly prismaService: PrismaService,
+		private readonly em: EntityManager,
 		private readonly userService: UserService,
 		private readonly configService: ConfigService,
 		private readonly providerService: ProviderService,
@@ -112,11 +112,9 @@ export class AuthService {
 		const providerInstance = this.providerService.findByService(provider)
 		const profile = await providerInstance.findUserByCode(code)
 
-		const account = await this.prismaService.account.findFirst({
-			where: {
-				id: profile.id,
-				provider: profile.provider
-			}
+		const account = await this.em.findOne(Account, {
+			id: profile.id,
+			provider: profile.provider
 		})
 
 		let user = account?.userId
@@ -137,16 +135,16 @@ export class AuthService {
 		)
 
 		if (!account) {
-			await this.prismaService.account.create({
-				data: {
-					userId: user.id,
-					type: 'oauth',
-					provider: profile.provider,
-					accessToken: profile.access_token,
-					refreshToken: profile.refresh_token,
-					expiresAt: profile.expires_at
-				}
+			const newAccount = this.em.create(Account, {
+				user: user,
+				type: 'oauth',
+				provider: profile.provider,
+				accessToken: profile.access_token,
+				refreshToken: profile.refresh_token,
+				expiresAt: profile.expires_at
 			})
+
+			await this.em.persistAndFlush(newAccount)
 		}
 
 		return this.saveSession(req, user)

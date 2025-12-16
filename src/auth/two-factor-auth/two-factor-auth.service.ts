@@ -1,29 +1,27 @@
+import { EntityManager } from '@mikro-orm/core'
 import {
 	BadRequestException,
 	Injectable,
 	Logger,
 	NotFoundException
 } from '@nestjs/common'
-import { TokenType } from '@prisma/client'
 
+import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
-import { PrismaService } from '@/prisma/prisma.service'
 
 @Injectable()
 export class TwoFactorAuthService {
 	private readonly logger = new Logger(TwoFactorAuthService.name)
 
 	public constructor(
-		private readonly prismaService: PrismaService,
+		private readonly em: EntityManager,
 		private readonly mailService: MailService
 	) {}
 
 	public async validateTwoFactorToken(email: string, code: string) {
-		const existingToken = await this.prismaService.token.findFirst({
-			where: {
-				email,
-				type: TokenType.TWO_FACTOR
-			}
+		const existingToken = await this.em.findOne(Token, {
+			email,
+			type: TokenType.TWO_FACTOR
 		})
 
 		if (!existingToken) {
@@ -46,12 +44,7 @@ export class TwoFactorAuthService {
 			)
 		}
 
-		await this.prismaService.token.delete({
-			where: {
-				id: existingToken.id,
-				type: TokenType.TWO_FACTOR
-			}
-		})
+		await this.em.removeAndFlush(existingToken)
 
 		return true
 	}
@@ -75,35 +68,30 @@ export class TwoFactorAuthService {
 		return true
 	}
 
-	private async generateTwoFactorToken(email: string) {
+	private async generateTwoFactorToken(email: string): Promise<Token> {
 		const token: string = Math.floor(
 			Math.random() * (1000000 - 100000) + 100000
 		).toString()
 		const expiresIn = new Date(new Date().getTime() + 300000)
 
-		const existingToken = await this.prismaService.token.findFirst({
-			where: {
-				email,
-				type: TokenType.TWO_FACTOR
-			}
+		const existingToken = await this.em.findOne(Token, {
+			email,
+			type: TokenType.TWO_FACTOR
 		})
 
 		if (existingToken) {
-			await this.prismaService.token.delete({
-				where: {
-					id: existingToken.id,
-					type: TokenType.TWO_FACTOR
-				}
-			})
+			await this.em.removeAndFlush(existingToken)
 		}
 
-		return await this.prismaService.token.create({
-			data: {
-				email,
-				token,
-				expiresIn,
-				type: TokenType.TWO_FACTOR
-			}
+		const newToken = this.em.create(Token, {
+			email,
+			token,
+			expiresIn,
+			type: TokenType.TWO_FACTOR
 		})
-  }
+
+		await this.em.persistAndFlush(newToken)
+
+		return newToken
+	}
 }

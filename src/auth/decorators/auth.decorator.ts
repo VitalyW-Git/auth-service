@@ -1,5 +1,6 @@
 import { applyDecorators, UseGuards } from '@nestjs/common'
-import { UserRole } from '@prisma/client'
+
+import { UserRole } from '@/database/enums'
 
 import { AuthGuard } from '../guards/auth.guard'
 import { RolesGuard } from '../guards/roles.guard'

@@ -1,24 +1,21 @@
+import { EntityManager } from '@mikro-orm/core'
 import { Injectable, NotFoundException } from '@nestjs/common'
-import {AuthMethod, User} from '@prisma/client'
 import { hash } from 'argon2'
 
-import { PrismaService } from '@/prisma/prisma.service'
+import { AuthMethod, User } from '@/database/entities'
 
 import { UpdateUserDto } from './dto/update-user.dto'
 
 @Injectable()
 export class UserService {
-	public constructor(private readonly prismaService: PrismaService) {}
+	public constructor(private readonly em: EntityManager) {}
 
 	public async findById(id: string): Promise<User> {
-		const user = await this.prismaService.user.findUnique({
-			where: {
-				id
-			},
-			include: {
-				accounts: true
-			}
-		})
+		const user = await this.em.findOne(
+			User,
+			{ id },
+			{ populate: ['accounts'] }
+		)
 
 		if (!user) {
 			throw new NotFoundException(
@@ -29,16 +26,13 @@ export class UserService {
 		return user
 	}
 
-	public async findByEmail(email: string): Promise<User> {
-		return await this.prismaService.user.findUnique({
-			where: {
-				email
-			},
-			include: {
-				accounts: true
-			}
-		})
-  }
+	public async findByEmail(email: string): Promise<User | null> {
+		return await this.em.findOne(
+			User,
+			{ email },
+			{ populate: ['accounts'] }
+		)
+	}
 
 	public async create(
 		email: string,
@@ -47,34 +41,34 @@ export class UserService {
 		picture: string,
 		method: AuthMethod,
 		isVerified: boolean
-	) {
-		return await this.prismaService.user.create({
-			data: {
-				email,
-				password: password ? await hash(password) : '',
-				displayName,
-				picture,
-				method,
-				isVerified
-			},
-			include: {
-				accounts: true
-			}
+	): Promise<User> {
+		const user = this.em.create(User, {
+			email,
+			password: password ? await hash(password) : '',
+			displayName,
+			picture,
+			method,
+			isVerified
 		})
-  }
 
-	public async update(userId: string, dto: UpdateUserDto) {
+		await this.em.persistAndFlush(user)
+
+		return this.em.findOne(
+			User,
+			{ id: user.id },
+			{ populate: ['accounts'] }
+		)
+	}
+
+	public async update(userId: string, dto: UpdateUserDto): Promise<User> {
 		const user = await this.findById(userId)
 
-		return await this.prismaService.user.update({
-			where: {
-				id: user.id
-			},
-			data: {
-				email: dto.email,
-				displayName: dto.name,
-				isTwoFactorEnabled: dto.isTwoFactorEnabled
-			}
-		})
-  }
+		user.email = dto.email
+		user.displayName = dto.name
+		user.isTwoFactorEnabled = dto.isTwoFactorEnabled
+
+		await this.em.flush()
+
+		return user
+	}
 }

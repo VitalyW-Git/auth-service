@@ -1,15 +1,15 @@
+import { EntityManager } from '@mikro-orm/core'
 import {
 	BadRequestException,
 	Injectable,
 	Logger,
 	NotFoundException
 } from '@nestjs/common'
-import { TokenType } from '@prisma/client'
 import { hash } from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
 
+import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
-import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
 
 import { NewPasswordDto } from './dto/new-password.dto'
@@ -20,7 +20,7 @@ export class PasswordRecoveryService {
 	private readonly logger = new Logger(PasswordRecoveryService.name)
 
 	public constructor(
-		private readonly prismaService: PrismaService,
+		private readonly em: EntityManager,
 		private readonly userService: UserService,
 		private readonly mailService: MailService
 	) {}
@@ -55,11 +55,9 @@ export class PasswordRecoveryService {
 	}
 
 	public async newPassword(dto: NewPasswordDto, token: string) {
-		const existingToken = await this.prismaService.token.findFirst({
-			where: {
-				token,
-				type: TokenType.PASSWORD_RESET
-			}
+		const existingToken = await this.em.findOne(Token, {
+			token,
+			type: TokenType.PASSWORD_RESET
 		})
 
 		if (!existingToken) {
@@ -86,52 +84,35 @@ export class PasswordRecoveryService {
 			)
 		}
 
-		await this.prismaService.user.update({
-			where: {
-				id: existingUser.id
-			},
-			data: {
-				password: await hash(dto.password)
-			}
-		})
-
-		await this.prismaService.token.delete({
-			where: {
-				id: existingToken.id,
-				type: TokenType.PASSWORD_RESET
-			}
-		})
+		existingUser.password = await hash(dto.password)
+		await this.em.removeAndFlush(existingToken)
+		await this.em.flush()
 
 		return true
 	}
 
-	private async generatePasswordResetToken(email: string) {
+	private async generatePasswordResetToken(email: string): Promise<Token> {
 		const token = uuidv4()
 		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
-		const existingToken = await this.prismaService.token.findFirst({
-			where: {
-				email,
-				type: TokenType.PASSWORD_RESET
-			}
+		const existingToken = await this.em.findOne(Token, {
+			email,
+			type: TokenType.PASSWORD_RESET
 		})
 
 		if (existingToken) {
-			await this.prismaService.token.delete({
-				where: {
-					id: existingToken.id,
-					type: TokenType.PASSWORD_RESET
-				}
-			})
+			await this.em.removeAndFlush(existingToken)
 		}
 
-		return await this.prismaService.token.create({
-			data: {
-				email,
-				token,
-				expiresIn,
-				type: TokenType.PASSWORD_RESET
-			}
+		const newToken = this.em.create(Token, {
+			email,
+			token,
+			expiresIn,
+			type: TokenType.PASSWORD_RESET
 		})
-  }
+
+		await this.em.persistAndFlush(newToken)
+
+		return newToken
+	}
 }
