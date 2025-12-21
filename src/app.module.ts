@@ -9,6 +9,7 @@ import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.modu
 import { DatabaseModule } from './database/database.module'
 import { IS_DEV_ENV } from './libs/common/utils/is-dev.util'
 import { MailModule } from './libs/mail/mail.module'
+import { SessionModule } from './libs/session/session.module'
 import { UserModule } from './user/user.module'
 
 @Module({
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module'
 			isGlobal: true
 		}),
 		DatabaseModule,
+		SessionModule,
 		AuthModule,
 		UserModule,
 		ProviderModule,

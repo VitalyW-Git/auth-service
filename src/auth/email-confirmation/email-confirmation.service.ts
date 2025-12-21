@@ -10,7 +10,7 @@ import {
 import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Token, TokenType, User } from '@/database/entities'
+import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
 import { UserService } from '@/user/user.service'
 
