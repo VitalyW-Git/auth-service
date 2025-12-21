@@ -17,7 +17,7 @@
 - `src/database/enums/token-type.enum.ts` - типы токенов
 
 ### 4. Конфигурация MikroORM
-- `mikro-orm.config.ts` - конфигурация для CLI с использованием `defineConfig` из `@mikro-orm/postgresql`
+- `src/config/mikro-orm.config.ts` - конфигурация для CLI
 - `src/database/database.module.ts` - модуль NestJS с MikroORM:
   - Используется `driver: PostgreSqlDriver` (в v6 вместо `type`)
   - EntityManager доступен глобально после инициализации
@@ -36,19 +36,45 @@ MikroORM использует паттерн Unit of Work. Это значит:
 - После вызова `forRootAsync()` EntityManager доступен для инъекции во все сервисы без необходимости экспорта модуля
 
 ## Команды для работы с миграциями
+
+### Создание миграции
+
 ```bash
-# Создать новую миграцию
+# Создать миграцию на основе изменений в Entity (автоматически определяет различия)
 npm run migration:create
 
-# Применить миграции
+# Создать миграцию с указанным названием (только если есть изменения в схеме)
+npm run migration:create -- --name=AddProductTable
+npm run migration:create -- --n AddProductTable
+
+# Создать пустую миграцию с указанным названием (даже если нет изменений)
+npm run migration:create -- --blank --name=CustomMigration
+npm run migration:create -- -b -n CustomMigration
+```
+
+Файл миграции будет создан с именем вида: `Migration20251215222808_AddProductTable.ts`
+
+### Применение и управление миграциями
+
+```bash
+# Проверить различия между Entity и схемой БД
+npm run migration:check
+
+# Показать список всех миграций
+npm run migration:list
+
+# Показать список ожидающих миграций
+npm run migration:pending
+
+# Применить все ожидающие миграции
 npm run migration:up
 
-# Откатить последнюю миграцию
+# Откатить последнюю примененную миграцию
 npm run migration:down
 
-# Пересоздать БД (удалит все данные!)
+# Пересоздать БД и применить все миграции (удалит все данные!)
 npm run migration:fresh
 
-# Удалить схему БД
+# Удалить схему БД (удалит все таблицы!)
 npm run schema:drop
 ```

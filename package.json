@@ -18,11 +18,14 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migration:create": "mikro-orm migration:create",
-    "migration:up": "mikro-orm migration:up",
-    "migration:down": "mikro-orm migration:down",
-    "migration:fresh": "mikro-orm migration:fresh",
-    "schema:drop": "mikro-orm schema:drop --run"
+    "migration:create": "mikro-orm migration:create --config=src/config/mikro-orm.config.ts",
+    "migration:up": "mikro-orm migration:up --config=src/config/mikro-orm.config.ts",
+    "migration:down": "mikro-orm migration:down --config=src/config/mikro-orm.config.ts",
+    "migration:fresh": "mikro-orm migration:fresh --config=src/config/mikro-orm.config.ts",
+    "migration:check": "mikro-orm migration:check --config=src/config/mikro-orm.config.ts",
+    "migration:pending": "mikro-orm migration:pending --config=src/config/mikro-orm.config.ts",
+    "migration:list": "mikro-orm migration:list --config=src/config/mikro-orm.config.ts",
+    "schema:drop": "mikro-orm schema:drop --run --config=src/config/mikro-orm.config.ts"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.6.2",
