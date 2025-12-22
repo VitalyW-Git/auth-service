@@ -73,24 +73,6 @@ RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 - `REDIS_USER` - пользователь (опционально)
 - `REDIS_PASSWORD` - пароль
 
-### ⚠️ Интерполяция переменных НЕ работает
-
-В файле `.env` **НЕ** используйте синтаксис подстановки переменных:
-
-```env
-# ❌ НЕПРАВИЛЬНО - не будет работать
-REDIS_URI='redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}'
-POSTGRES_URI='postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}'
-
-# ✅ ПРАВИЛЬНО - используйте конкретные значения
-REDIS_HOST=localhost
-REDIS_PORT=6381
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-```
-
-Конфигурация подключений собирается программно в `src/main.ts` (для Redis) и `src/database/database.module.ts` (для PostgreSQL).
-
 ## Обязательные переменные
 
 Минимальный набор для запуска приложения:
@@ -108,4 +90,3 @@ POSTGRES_PORT=5432
 - **Mail** - для отправки email подтверждений и 2FA кодов
 - **OAuth** - для входа через Google/Yandex
 - **reCAPTCHA** - для защиты от ботов
-

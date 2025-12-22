@@ -3,7 +3,6 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { Migrator } from '@mikro-orm/migrations'
 import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
-
 import { Account, Token, User } from '@/database/entities'
 
 config()
@@ -26,6 +25,7 @@ export const getMikroOrmConfig = (
 	configService: ConfigService
 ): Options<PostgreSqlDriver> => ({
 	...getBaseConfig(),
+	driver: PostgreSqlDriver,
 	dbName: configService.getOrThrow<string>('POSTGRES_DB'),
 	host: configService.getOrThrow<string>('POSTGRES_HOST'),
 	port: configService.getOrThrow<number>('POSTGRES_PORT'),
