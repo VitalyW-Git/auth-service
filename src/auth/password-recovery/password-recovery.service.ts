@@ -1,16 +1,20 @@
 import { EntityManager } from '@mikro-orm/core'
 import {
 	BadRequestException,
+	Inject,
 	Injectable,
 	Logger,
 	NotFoundException
 } from '@nestjs/common'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { hash } from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
-import { UserService } from '@/user/user.service'
+import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
+import { IUserRepository } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
+import { Password } from '@/modules/user/domain/value-objects/password.value-object'
 
 import { NewPasswordDto } from './dto/new-password.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
@@ -21,12 +25,17 @@ export class PasswordRecoveryService {
 
 	public constructor(
 		private readonly em: EntityManager,
-		private readonly userService: UserService,
+		private readonly queryBus: QueryBus,
+		private readonly commandBus: CommandBus,
+		@Inject('IUserRepository')
+		private readonly userRepository: IUserRepository,
 		private readonly mailService: MailService
 	) {}
 
 	public async resetPassword(dto: ResetPasswordDto) {
-		const existingUser = await this.userService.findByEmail(dto.email)
+		const existingUser = await this.queryBus.execute(
+			new GetUserByEmailQuery(dto.email)
+		)
 
 		if (!existingUser) {
 			throw new NotFoundException(
@@ -35,7 +44,7 @@ export class PasswordRecoveryService {
 		}
 
 		const passwordResetToken = await this.generatePasswordResetToken(
-			existingUser.email
+			existingUser.getEmail().getValue()
 		)
 
 		try {
@@ -74,8 +83,8 @@ export class PasswordRecoveryService {
 			)
 		}
 
-		const existingUser = await this.userService.findByEmail(
-			existingToken.email
+		const existingUser = await this.queryBus.execute(
+			new GetUserByEmailQuery(existingToken.email)
 		)
 
 		if (!existingUser) {
@@ -84,9 +93,11 @@ export class PasswordRecoveryService {
 			)
 		}
 
-		existingUser.password = await hash(dto.password)
+		const hashedPassword = await hash(dto.password)
+		const password = Password.fromHashed(hashedPassword)
+		existingUser.updatePassword(password)
+		await this.userRepository.save(existingUser)
 		await this.em.removeAndFlush(existingToken)
-		await this.em.flush()
 
 		return true
 	}

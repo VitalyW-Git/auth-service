@@ -1,6 +1,5 @@
 import { EntityManager } from '@mikro-orm/core'
 import {
-	ConflictException,
 	forwardRef,
 	Inject,
 	Injectable,
@@ -8,24 +7,30 @@ import {
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { ConfigService } from '@nestjs/config'
 import { verify } from 'argon2'
 import { Request, Response } from 'express'
 
-import { Account, AuthMethod, User } from '@/database/entities'
-import { UserService } from '@/user/user.service'
+import { Account, AuthMethod } from '@/database/entities'
+import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
+import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
+import {GetUserQuery, GetUserResult} from '@/modules/user/application/queries/get-user.query'
 
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
 import { EmailConfirmationService } from './email-confirmation/email-confirmation.service'
 import { ProviderService } from './provider/provider.service'
 import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
+import {UserInterface} from "@/modules/user/application/common/interface/user.interface";
+import {User} from "@/modules/user/domain/entities/user.entity";
 
 @Injectable()
 export class AuthService {
 	public constructor(
 		private readonly em: EntityManager,
-		private readonly userService: UserService,
+		private readonly commandBus: CommandBus,
+		private readonly queryBus: QueryBus,
 		private readonly configService: ConfigService,
 		private readonly providerService: ProviderService,
 		@Inject(forwardRef(() => EmailConfirmationService))
@@ -34,24 +39,20 @@ export class AuthService {
 	) {}
 
 	public async register(dto: RegisterDto) {
-		const isExists = await this.userService.findByEmail(dto.email)
-
-		if (isExists) {
-			throw new ConflictException(
-				'Регистрация не удалась. Пользователь с таким email уже существует. Пожалуйста, используйте другой email или войдите в систему.'
+		const newUser: UserInterface = await this.commandBus.execute(
+			new CreateUserCommand(
+				dto.email,
+				dto.password,
+				dto.name,
+				'',
+				AuthMethod.CREDENTIALS,
+				false
 			)
-		}
-
-		const newUser = await this.userService.create(
-			dto.email,
-			dto.password,
-			dto.name,
-			'',
-			AuthMethod.CREDENTIALS,
-			false
 		)
 
-		await this.emailConfirmationService.sendVerificationToken(newUser.email)
+		await this.emailConfirmationService.sendVerificationToken(
+			newUser.email
+		)
 
 		return {
 			message:
@@ -60,15 +61,20 @@ export class AuthService {
 	}
 
 	public async login(req: Request, dto: LoginDto) {
-		const user = await this.userService.findByEmail(dto.email)
+		const user: User = await this.queryBus.execute(
+			new GetUserByEmailQuery(dto.email)
+		)
 
-		if (!user || !user.password) {
+		if (!user || !user.getPassword()) {
 			throw new NotFoundException(
 				'Пользователь не найден. Пожалуйста, проверьте введенные данные'
 			)
 		}
 
-		const isValidPassword = await verify(user.password, dto.password)
+		const isValidPassword = await verify(
+			user.getPassword()!.getHashedValue(),
+			dto.password
+		)
 
 		if (!isValidPassword) {
 			throw new UnauthorizedException(
@@ -76,18 +82,20 @@ export class AuthService {
 			)
 		}
 
-		if (!user.isVerified) {
+		if (!user.getIsVerified()) {
 			await this.emailConfirmationService.sendVerificationToken(
-				user.email
+				user.getEmail().getValue()
 			)
 			throw new UnauthorizedException(
 				'Ваш email не подтвержден. Пожалуйста, проверьте вашу почту и подтвердите адрес.'
 			)
 		}
 
-		if (user.isTwoFactorEnabled) {
+		if (user.getIsTwoFactorEnabled()) {
 			if (!dto.code) {
-				await this.twoFactorAuthService.sendTwoFactorToken(user.email)
+				await this.twoFactorAuthService.sendTwoFactorToken(
+					user.getEmail().getValue()
+				)
 
 				return {
 					message:
@@ -96,12 +104,23 @@ export class AuthService {
 			}
 
 			await this.twoFactorAuthService.validateTwoFactorToken(
-				user.email,
+				user.getEmail().getValue(),
 				dto.code
 			)
 		}
-
-		return this.saveSession(req, user)
+    const userResult = new GetUserResult(
+      user.id,
+      user.getEmail().getValue(),
+      user.getDisplayName(),
+      user.getPicture(),
+      user.getRole(),
+      user.getIsVerified(),
+      user.getIsTwoFactorEnabled(),
+      user.getMethod(),
+      user.getCreatedAt(),
+      user.getUpdatedAt()
+    )
+		return this.saveSession(req, userResult)
 	}
 
 	public async extractProfileFromCode(
@@ -118,25 +137,27 @@ export class AuthService {
 		})
 
 		let user = account?.userId
-			? await this.userService.findById(account.userId)
+			? await this.queryBus.execute(new GetUserQuery(account.userId))
 			: null
 
 		if (user) {
 			return this.saveSession(req, user)
 		}
 
-		user = await this.userService.create(
-			profile.email,
-			'',
-			profile.name,
-			profile.picture,
-			AuthMethod[profile.provider.toUpperCase()],
-			true
+		user = await this.commandBus.execute(
+			new CreateUserCommand(
+				profile.email,
+				'',
+				profile.name,
+				profile.picture,
+				AuthMethod[profile.provider.toUpperCase()],
+				true
+			)
 		)
 
 		if (!account) {
 			const newAccount = this.em.create(Account, {
-				user: user,
+				user,
 				type: 'oauth',
 				provider: profile.provider,
 				accessToken: profile.access_token,
@@ -168,7 +189,7 @@ export class AuthService {
 		})
 	}
 
-	public async saveSession(req: Request, user: User) {
+	public async saveSession(req: Request, user: UserInterface) {
 		return new Promise((resolve, reject) => {
 			req.session.userId = user.id
 
@@ -182,7 +203,16 @@ export class AuthService {
 				}
 
 				resolve({
-					user
+					user: {
+						id: user.id,
+						email: user.email,
+						displayName: user.displayName,
+						picture: user.picture,
+						role: user.role,
+						isVerified: user.isVerified,
+						isTwoFactorEnabled: user.isTwoFactorEnabled,
+						method: user.method
+					}
 				})
 			})
 		})

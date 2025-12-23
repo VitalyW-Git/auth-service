@@ -10,6 +10,9 @@ export class UpdateUserDto {
 	@IsNotEmpty({ message: 'Email обязателен для заполнения.' })
 	email: string
 
-	@IsBoolean({ message: 'isTwoFactorEnabled должно быть булевым значением.' })
+	@IsBoolean({
+		message: 'isTwoFactorEnabled должно быть булевым значением.'
+	})
 	isTwoFactorEnabled: boolean
 }
+

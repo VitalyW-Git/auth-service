@@ -7,16 +7,19 @@ import {
 	Logger,
 	NotFoundException
 } from '@nestjs/common'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
-import { UserService } from '@/user/user.service'
+import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
+import { VerifyUserCommand } from '@/modules/user/application/commands/verify-user.command'
 
 import { AuthService } from '../auth.service'
 
 import { ConfirmationDto } from './dto/confirmation.dto'
+import {GetUserResult} from "@/modules/user/application/queries/get-user.query";
 
 @Injectable()
 export class EmailConfirmationService {
@@ -25,7 +28,8 @@ export class EmailConfirmationService {
 	public constructor(
 		private readonly em: EntityManager,
 		private readonly mailService: MailService,
-		private readonly userService: UserService,
+		private readonly queryBus: QueryBus,
+		private readonly commandBus: CommandBus,
 		@Inject(forwardRef(() => AuthService))
 		private readonly authService: AuthService
 	) {}
@@ -50,8 +54,8 @@ export class EmailConfirmationService {
 			)
 		}
 
-		const existingUser = await this.userService.findByEmail(
-			existingToken.email
+		const existingUser = await this.queryBus.execute(
+			new GetUserByEmailQuery(existingToken.email)
 		)
 
 		if (!existingUser) {
@@ -60,11 +64,22 @@ export class EmailConfirmationService {
 			)
 		}
 
-		existingUser.isVerified = true
+		await this.commandBus.execute(new VerifyUserCommand(existingUser.id))
 		await this.em.removeAndFlush(existingToken)
-		await this.em.flush()
 
-		return this.authService.saveSession(req, existingUser)
+    const userResult = new GetUserResult(
+      existingUser.id,
+      existingUser.getEmail().getValue(),
+      existingUser.getDisplayName(),
+      existingUser.getPicture(),
+      existingUser.getRole(),
+      existingUser.getIsVerified(),
+      existingUser.getIsTwoFactorEnabled(),
+      existingUser.getMethod(),
+      existingUser.getCreatedAt(),
+      existingUser.getUpdatedAt()
+    )
+		return this.authService.saveSession(req, userResult!)
 	}
 
 	public async sendVerificationToken(email: string) {

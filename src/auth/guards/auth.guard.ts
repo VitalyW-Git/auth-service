@@ -4,12 +4,13 @@ import {
 	Injectable,
 	UnauthorizedException
 } from '@nestjs/common'
+import { QueryBus } from '@nestjs/cqrs'
 
-import { UserService } from '@/user/user.service'
+import { GetUserQuery } from '@/modules/user/application/queries/get-user.query'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-	public constructor(private readonly userService: UserService) {}
+	public constructor(private readonly queryBus: QueryBus) {}
 
 	public async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest()
@@ -20,9 +21,11 @@ export class AuthGuard implements CanActivate {
 			)
 		}
 
-		const user = await this.userService.findById(request.session.userId)
+		const userResult = await this.queryBus.execute(
+			new GetUserQuery(request.session.userId)
+		)
 
-		request.user = user
+		request.user = userResult
 
 		return true
 	}

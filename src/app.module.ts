@@ -8,7 +8,7 @@ import { TwoFactorAuthModule } from '@/auth/two-factor-auth/two-factor-auth.modu
 import { DatabaseModule } from '@/database/database.module'
 import { MailModule } from '@/libs/mail/mail.module'
 import { SessionModule } from '@/libs/session/session.module'
-import { UserModule } from '@/user/user.module'
+import { UserModule } from '@/modules/user/user.module'
 
 @Module({
 	imports: [
