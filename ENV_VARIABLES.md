@@ -34,6 +34,9 @@ SESSION_FOLDER=sessions:
 # Cookies
 COOKIES_SECRET=your-cookies-secret-key-here
 
+# Токены (ключ HMAC для хранения токенов в БД, сгенерировать: openssl rand -hex 32)
+TOKEN_HMAC_SECRET=your-token-hmac-secret-here
+
 # Mail (для отправки email)
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
@@ -81,7 +84,8 @@ RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 2. **Redis:** `REDIS_*` переменные
 3. **Session:** `SESSION_SECRET`, `SESSION_NAME`
 4. **Cookies:** `COOKIES_SECRET`
-5. **Application:** `APPLICATION_PORT`, `ALLOWED_ORIGIN`
+5. **Токены:** `TOKEN_HMAC_SECRET` — ключ HMAC, которым хешируются токены подтверждения, сброса пароля и коды 2FA. Смена ключа делает недействительными все уже выданные токены.
+6. **Application:** `APPLICATION_PORT`, `ALLOWED_ORIGIN`
 
 ## Опциональные переменные
 
