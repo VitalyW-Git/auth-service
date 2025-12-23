@@ -68,9 +68,11 @@ npm run migration:pending
 
 # Применить все ожидающие миграции
 npm run migration:up
+npm run migration:up -- --only Migration20260927120000
 
 # Откатить последнюю примененную миграцию
 npm run migration:down
+npm run migration:down -- --only Migration20260927120000
 
 # Пересоздать БД и применить все миграции (удалит все данные!)
 npm run migration:fresh
