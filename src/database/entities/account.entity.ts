@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core'
 import { v4 } from 'uuid'
 
-import { User } from './user.entity'
+import {UserEntity} from "@/modules/user/infrastructure/persistence/entities/user.entity";
 
 @Entity({ tableName: 'accounts' })
 export class Account {
@@ -29,8 +29,8 @@ export class Account {
 	@Property({ fieldName: 'updated_at', onUpdate: () => new Date() })
 	updatedAt: Date = new Date()
 
-	@ManyToOne(() => User, { nullable: true, fieldName: 'user_id' })
-	user?: User
+	@ManyToOne(() => UserEntity, { nullable: true, fieldName: 'user_id' })
+	user?: UserEntity
 
 	@Property({ persist: false })
 	get userId(): string | undefined {
