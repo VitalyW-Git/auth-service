@@ -5,13 +5,11 @@ import { hash } from 'argon2'
 
 import { UserRole } from '@/database/enums'
 
-import { User } from '../../../domain/entities/user.entity'
-import { UserEmail } from '../../../domain/value-objects/user-email.value-object'
-import { Password } from '../../../domain/value-objects/password.value-object'
-import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
-import { CreateUserCommand } from '../create-user.command'
-import {GetUserResult} from "@/modules/user/application/queries/get-user.query";
-import {UserInterface} from "@/modules/user/application/common/interface/user.interface";
+import { User } from '@/modules/user/domain/entities/user.entity'
+import { UserEmail } from '@/modules/user/domain/value-objects/user-email.value-object'
+import { Password } from '@/modules/user/domain/value-objects/password.value-object'
+import { IUserRepository } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
+import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -20,7 +18,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 		private readonly userRepository: IUserRepository,
 	) {}
 
-	async execute(command: CreateUserCommand): Promise<UserInterface> {
+	async execute(command: CreateUserCommand): Promise<User> {
 		const email = UserEmail.create(command.email)
 		const existingUser = await this.userRepository.findByEmail(
 			email.getValue()
@@ -50,18 +48,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 		await this.userRepository.save(user)
 
-    return new GetUserResult(
-      user.id,
-      user.getEmail().getValue(),
-      user.getDisplayName(),
-      user.getPicture(),
-      user.getRole(),
-      user.getIsVerified(),
-      user.getIsTwoFactorEnabled(),
-      user.getMethod(),
-      user.getCreatedAt(),
-      user.getUpdatedAt()
-    )
+    return user
 	}
 }
 
