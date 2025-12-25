@@ -12,5 +12,5 @@ export interface IAccountRepository {
 		accessToken: string,
 		refreshToken: string,
 		expiresAt: number
-	): Promise<AccountEntity>
+	): Promise<void>
 }

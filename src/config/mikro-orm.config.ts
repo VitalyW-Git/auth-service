@@ -10,25 +10,26 @@ import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/u
 
 config()
 
-const getBaseConfig = (): Omit<
-	Options<PostgreSqlDriver>,
-	'dbName' | 'host' | 'port' | 'user' | 'password'
-> => ({
-	driver: PostgreSqlDriver,
-	entities: [Token, UserEntity, AccountEntity],
-	entitiesTs: [
-		'src/database/entities/**/*.entity.ts',
-		'src/modules/**/infrastructure/persistence/entities/**/*.entity.ts'
-	],
-	migrations: {
-		path: 'dist/database/migrations',
-		pathTs: 'src/database/migrations',
-		tableName: 'mikro_orm_migrations',
-		transactional: true
-	},
-	extensions: [Migrator],
-	debug: process.env.NODE_ENV !== 'production'
-})
+const getBaseConfig = () =>
+	({
+		driver: PostgreSqlDriver,
+		entities: [Token, UserEntity, AccountEntity],
+		entitiesTs: [
+			'src/database/entities/**/*.entity.ts',
+			'src/modules/**/infrastructure/persistence/entities/**/*.entity.ts'
+		],
+		migrations: {
+			path: 'dist/database/migrations',
+			pathTs: 'src/database/migrations',
+			tableName: 'mikro_orm_migrations',
+			transactional: true
+		},
+		extensions: [Migrator],
+		debug: process.env.NODE_ENV !== 'production'
+	}) as Omit<
+		Options<PostgreSqlDriver>,
+		'dbName' | 'host' | 'port' | 'user' | 'password'
+	>
 
 export const getMikroOrmConfig = (
 	configService: ConfigService

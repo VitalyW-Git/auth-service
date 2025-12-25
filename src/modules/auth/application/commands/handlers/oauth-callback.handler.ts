@@ -9,7 +9,10 @@ import { ProviderService } from '@/modules/auth/infrastructure/provider/provider
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
 import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
-import { GetUserQuery } from '@/modules/user/application/queries/get-user.query'
+import {
+	GetUserQuery,
+	GetUserResult
+} from '@/modules/user/application/queries/get-user.query'
 
 @CommandHandler(OAuthCallbackCommand)
 export class OAuthCallbackHandler
@@ -37,7 +40,7 @@ export class OAuthCallbackHandler
 			profile.provider
 		)
 
-		let user: UserInterface | null = account?.userId
+		const user: UserInterface | null = account?.userId
 			? await this.queryBus.execute(new GetUserQuery(account.userId))
 			: null
 
@@ -66,6 +69,19 @@ export class OAuthCallbackHandler
 			)
 		}
 
-		return this.sessionService.saveSession(command.req, newUser)
+		const userResult = new GetUserResult(
+			newUser.id,
+			newUser.getEmail().getValue(),
+			newUser.getDisplayName(),
+			newUser.getPicture(),
+			newUser.getRole(),
+			newUser.getIsVerified(),
+			newUser.getIsTwoFactorEnabled(),
+			newUser.getMethod(),
+			newUser.getCreatedAt(),
+			newUser.getUpdatedAt()
+		)
+
+		return this.sessionService.saveSession(command.req, userResult)
 	}
 }

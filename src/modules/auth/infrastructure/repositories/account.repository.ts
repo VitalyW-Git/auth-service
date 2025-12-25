@@ -26,7 +26,7 @@ export class AccountRepository implements IAccountRepository {
 		accessToken: string,
 		refreshToken: string,
 		expiresAt: number
-	): Promise<AccountEntity> {
+	): Promise<void> {
 		const account = this.em.create(AccountEntity, {
 			user: this.toEntity(user),
 			type: 'oauth',
@@ -37,7 +37,6 @@ export class AccountRepository implements IAccountRepository {
 		})
 
 		await this.em.persistAndFlush(account)
-		return account
 	}
 
 	private toEntity(user: User): UserEntity {
