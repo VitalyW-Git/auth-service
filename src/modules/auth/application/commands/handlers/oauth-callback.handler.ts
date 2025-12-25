@@ -57,18 +57,15 @@ export class OAuthCallbackHandler
 		)
 
 		if (!account) {
-			const userEntity = await this.em.findOne(UserEntity, { id: user.id })
-			if (userEntity) {
-				const newAccount = this.em.create(Account, {
-					user: userEntity,
-					type: 'oauth',
-					provider: profile.provider,
-					accessToken: profile.access_token,
-					refreshToken: profile.refresh_token,
-					expiresAt: profile.expires_at
-				})
-				await this.em.persistAndFlush(newAccount)
-			}
+      const newAccount = this.em.create(Account, {
+        user,
+        type: 'oauth',
+        provider: profile.provider,
+        accessToken: profile.access_token,
+        refreshToken: profile.refresh_token,
+        expiresAt: profile.expires_at
+      })
+      await this.em.persistAndFlush(newAccount)
 		}
 
 		return this.sessionService.saveSession(command.req, user)
