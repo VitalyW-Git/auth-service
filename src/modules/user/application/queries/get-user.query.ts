@@ -1,4 +1,4 @@
-import {UserInterface} from "@/modules/user/application/common/interface/user.interface";
+import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
 
 export class GetUserQuery {
 	constructor(public readonly userId: string) {}
@@ -18,4 +18,3 @@ export class GetUserResult implements UserInterface {
 		public readonly updatedAt: Date
 	) {}
 }
-

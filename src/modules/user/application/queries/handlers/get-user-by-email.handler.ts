@@ -1,5 +1,5 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
 import { User } from '../../../domain/entities/user.entity'
 import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
@@ -18,4 +18,3 @@ export class GetUserByEmailHandler
 		return await this.userRepository.findByEmail(query.email)
 	}
 }
-

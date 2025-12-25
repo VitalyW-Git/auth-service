@@ -116,4 +116,3 @@ export class BaseOAuthService {
 		return this.options.scopes
 	}
 }
-

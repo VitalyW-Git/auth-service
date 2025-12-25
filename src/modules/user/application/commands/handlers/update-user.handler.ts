@@ -1,11 +1,12 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { UserEmail } from '../../../domain/value-objects/user-email.value-object'
+import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
+import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
+
 import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
+import { UserEmail } from '../../../domain/value-objects/user-email.value-object'
 import { UpdateUserCommand } from '../update-user.command'
-import {GetUserResult} from "@/modules/user/application/queries/get-user.query";
-import {UserInterface} from "@/modules/user/application/common/interface/user.interface";
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
@@ -33,18 +34,17 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
 
 		await this.userRepository.save(user)
 
-    return new GetUserResult(
-      user.id,
-      user.getEmail().getValue(),
-      user.getDisplayName(),
-      user.getPicture(),
-      user.getRole(),
-      user.getIsVerified(),
-      user.getIsTwoFactorEnabled(),
-      user.getMethod(),
-      user.getCreatedAt(),
-      user.getUpdatedAt()
-    )
+		return new GetUserResult(
+			user.id,
+			user.getEmail().getValue(),
+			user.getDisplayName(),
+			user.getPicture(),
+			user.getRole(),
+			user.getIsVerified(),
+			user.getIsTwoFactorEnabled(),
+			user.getMethod(),
+			user.getCreatedAt(),
+			user.getUpdatedAt()
+		)
 	}
 }
-

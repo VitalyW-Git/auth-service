@@ -1,22 +1,25 @@
 import { Options } from '@mikro-orm/core'
-import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { Migrator } from '@mikro-orm/migrations'
+import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
-import { Token } from '@/database/entities'
-import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/user.entity'
-import { AccountEntity } from "@/modules/auth/infrastructure/persistence/entities/account.entity";
 
+import { Token } from '@/database/entities'
+import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
+import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/user.entity'
 
 config()
 
-const getBaseConfig = (): Omit<Options<PostgreSqlDriver>, 'dbName' | 'host' | 'port' | 'user' | 'password'> => ({
+const getBaseConfig = (): Omit<
+	Options<PostgreSqlDriver>,
+	'dbName' | 'host' | 'port' | 'user' | 'password'
+> => ({
 	driver: PostgreSqlDriver,
 	entities: [Token, UserEntity, AccountEntity],
 	entitiesTs: [
-    'src/database/entities/**/*.entity.ts',
-    'src/modules/**/infrastructure/persistence/entities/**/*.entity.ts'
-  ],
+		'src/database/entities/**/*.entity.ts',
+		'src/modules/**/infrastructure/persistence/entities/**/*.entity.ts'
+	],
 	migrations: {
 		path: 'dist/database/migrations',
 		pathTs: 'src/database/migrations',
@@ -47,4 +50,3 @@ export default {
 	user: process.env.POSTGRES_USER || 'postgres',
 	password: process.env.POSTGRES_PASSWORD || 'postgres'
 } as Options<PostgreSqlDriver>
-

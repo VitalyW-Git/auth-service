@@ -5,4 +5,3 @@ export class ConfirmationDto {
 	@IsNotEmpty({ message: 'Поле токен не может быть пустым.' })
 	token: string
 }
-

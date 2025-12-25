@@ -1,17 +1,16 @@
+import { NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { QueryBus } from '@nestjs/cqrs'
-import { NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { verify } from 'argon2'
 
+import { LoginCommand } from '@/modules/auth/application/commands/login.command'
+import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
+import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
+import { TwoFactorAuthService } from '@/modules/auth/infrastructure/two-factor-auth/two-factor-auth.service'
+import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
 import { User } from '@/modules/user/domain/entities/user.entity'
-import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
-
-import { LoginCommand } from '@/modules/auth/application/commands/login.command'
-import { TwoFactorAuthService } from '@/modules/auth/infrastructure/two-factor-auth/two-factor-auth.service'
-import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
-import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -25,7 +24,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 	public async execute(
 		command: LoginCommand
 	): Promise<{ message?: string; user?: UserInterface }> {
-    const user: User = await this.queryBus.execute(
+		const user: User = await this.queryBus.execute(
 			new GetUserByEmailQuery(command.email)
 		)
 		if (!user || !user.getPassword()) {
@@ -88,4 +87,3 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 		return this.sessionService.saveSession(command.req, userResult)
 	}
 }
-

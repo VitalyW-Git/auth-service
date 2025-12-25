@@ -17,4 +17,3 @@ export function Authorization(...roles: UserRole[]) {
 
 	return applyDecorators(UseGuards(AuthGuard))
 }
-

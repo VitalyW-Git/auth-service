@@ -1,7 +1,6 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InternalServerErrorException } from '@nestjs/common'
-import { Request, Response } from 'express'
 import { ConfigService } from '@nestjs/config'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
 import { LogoutCommand } from '../logout.command'
 
@@ -9,9 +8,7 @@ import { LogoutCommand } from '../logout.command'
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {
 	public constructor(private readonly configService: ConfigService) {}
 
-	public async execute(
-		command: LogoutCommand
-	): Promise<void> {
+	public async execute(command: LogoutCommand): Promise<void> {
 		return new Promise((resolve, reject) => {
 			command.req.session.destroy(err => {
 				if (err) {
@@ -29,4 +26,3 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
 		})
 	}
 }
-

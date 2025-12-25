@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common'
 import { EntityManager } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { EntityRepository } from '@mikro-orm/postgresql'
+import { Injectable } from '@nestjs/common'
 
 import { User } from '../../domain/entities/user.entity'
-import { UserEmail } from '../../domain/value-objects/user-email.value-object'
-import { Password } from '../../domain/value-objects/password.value-object'
 import { IUserRepository } from '../../domain/repository-interfaces/user.repository.interface'
+import { Password } from '../../domain/value-objects/password.value-object'
+import { UserEmail } from '../../domain/value-objects/user-email.value-object'
 import { UserEntity } from '../persistence/entities/user.entity'
 
 @Injectable()
@@ -14,7 +14,7 @@ export class UserRepository implements IUserRepository {
 	constructor(
 		@InjectRepository(UserEntity)
 		private readonly ormRepo: EntityRepository<UserEntity>,
-		private readonly em: EntityManager,
+		private readonly em: EntityManager
 	) {}
 
 	async findById(id: string): Promise<User | null> {
@@ -94,4 +94,3 @@ export class UserRepository implements IUserRepository {
 		entity.updatedAt = user.getUpdatedAt()
 	}
 }
-

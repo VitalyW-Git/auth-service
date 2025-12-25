@@ -9,14 +9,14 @@ import {
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
+import { UserRole } from '@/database/enums'
 import { Authorization } from '@/modules/auth/presentation/decorators/auth.decorator'
 import { Authorized } from '@/modules/auth/presentation/decorators/authorized.decorator'
-import { UserRole } from '@/database/enums'
+import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
 
 import { UpdateUserCommand } from '../../application/commands/update-user.command'
-import {GetUserQuery} from '../../application/queries/get-user.query'
+import { GetUserQuery } from '../../application/queries/get-user.query'
 import { UpdateUserDto } from '../dto/update-user.dto'
-import {UserInterface} from "@/modules/user/application/common/interface/user.interface";
 
 @Controller('users')
 export class UserController {
@@ -28,7 +28,9 @@ export class UserController {
 	@Authorization()
 	@HttpCode(HttpStatus.OK)
 	@Get('profile')
-	public async findProfile(@Authorized('id') userId: string): Promise<UserInterface> {
+	public async findProfile(
+		@Authorized('id') userId: string
+	): Promise<UserInterface> {
 		return await this.queryBus.execute(new GetUserQuery(userId))
 	}
 
@@ -47,8 +49,12 @@ export class UserController {
 		@Body() dto: UpdateUserDto
 	): Promise<UserInterface> {
 		return await this.commandBus.execute(
-			new UpdateUserCommand(userId, dto.email, dto.name, dto.isTwoFactorEnabled)
+			new UpdateUserCommand(
+				userId,
+				dto.email,
+				dto.name,
+				dto.isTwoFactorEnabled
+			)
 		)
 	}
 }
-

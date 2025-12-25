@@ -11,9 +11,11 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
-import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
-import { GetUserQuery, GetUserResult } from '@/modules/user/application/queries/get-user.query'
 import { VerifyUserCommand } from '@/modules/user/application/commands/verify-user.command'
+import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
+import {
+	GetUserResult
+} from '@/modules/user/application/queries/get-user.query'
 
 import { ConfirmationDto } from '../../application/dto/confirmation.dto'
 import { SessionService } from '../session/session.service'
@@ -121,4 +123,3 @@ export class EmailConfirmationService {
 		return token
 	}
 }
-

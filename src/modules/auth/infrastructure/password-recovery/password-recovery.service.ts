@@ -126,4 +126,3 @@ export class PasswordRecoveryService {
 		return newToken
 	}
 }
-

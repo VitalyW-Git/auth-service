@@ -6,4 +6,3 @@ export class UpdateUserCommand {
 		public readonly isTwoFactorEnabled: boolean
 	) {}
 }
-

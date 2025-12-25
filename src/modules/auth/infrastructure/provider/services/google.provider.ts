@@ -44,4 +44,3 @@ interface GoogleProfile extends Record<string, any> {
 	access_token: string
 	refresh_token?: string
 }
-

@@ -19,4 +19,3 @@ export class ProviderService implements OnModuleInit {
 		return this.options.services.find(s => s.name === service) ?? null
 	}
 }
-

@@ -12,19 +12,19 @@ import {
 	Res,
 	UseGuards
 } from '@nestjs/common'
-import { CommandBus } from '@nestjs/cqrs'
 import { ConfigService } from '@nestjs/config'
+import { CommandBus } from '@nestjs/cqrs'
 import { Recaptcha } from '@nestlab/google-recaptcha'
 import { Request, Response } from 'express'
 
-import { LoginDto } from '@/modules/auth/application/dto/login.dto'
-import { RegisterDto } from '@/modules/auth/application/dto/register.dto'
-import { RegisterCommand } from '@/modules/auth/application/commands/register.command'
 import { LoginCommand } from '@/modules/auth/application/commands/login.command'
 import { LogoutCommand } from '@/modules/auth/application/commands/logout.command'
 import { OAuthCallbackCommand } from '@/modules/auth/application/commands/oauth-callback.command'
-import { AuthProviderGuard } from '@/modules/auth/presentation/guards/provider.guard'
+import { RegisterCommand } from '@/modules/auth/application/commands/register.command'
+import { LoginDto } from '@/modules/auth/application/dto/login.dto'
+import { RegisterDto } from '@/modules/auth/application/dto/register.dto'
 import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
+import { AuthProviderGuard } from '@/modules/auth/presentation/guards/provider.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -38,15 +38,17 @@ export class AuthController {
 	@Post('register')
 	@HttpCode(HttpStatus.OK)
 	public async register(@Body() dto: RegisterDto) {
-		return this.commandBus.execute(new RegisterCommand(dto.email, dto.password, dto.name))
+		return this.commandBus.execute(
+			new RegisterCommand(dto.email, dto.password, dto.name)
+		)
 	}
 
 	@Recaptcha()
 	@Post('login')
 	@HttpCode(HttpStatus.OK)
 	public async login(@Req() req: Request, @Body() dto: LoginDto) {
-    const loginCommand = new LoginCommand(dto.email, dto.password, dto.code)
-    loginCommand.req = req
+		const loginCommand = new LoginCommand(dto.email, dto.password, dto.code)
+		loginCommand.req = req
 		return this.commandBus.execute(loginCommand)
 	}
 
@@ -63,8 +65,8 @@ export class AuthController {
 				'Не был предоставлен код авторизации.'
 			)
 		}
-    const authCallbackCommand = new OAuthCallbackCommand(provider, code)
-    authCallbackCommand.req = req
+		const authCallbackCommand = new OAuthCallbackCommand(provider, code)
+		authCallbackCommand.req = req
 		await this.commandBus.execute(authCallbackCommand)
 
 		return res.redirect(
@@ -91,4 +93,3 @@ export class AuthController {
 		return this.commandBus.execute(new LogoutCommand(req, res))
 	}
 }
-

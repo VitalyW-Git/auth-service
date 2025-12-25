@@ -11,4 +11,3 @@ export type TypeOptions = {
 
 export type TypeAsyncOptions = Pick<ModuleMetadata, 'imports'> &
 	Pick<FactoryProvider<TypeOptions>, 'useFactory' | 'inject'>
-

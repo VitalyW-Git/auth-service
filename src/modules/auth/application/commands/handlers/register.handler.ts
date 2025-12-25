@@ -2,11 +2,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CommandBus } from '@nestjs/cqrs'
 
 import { AuthMethod } from '@/database/entities'
-import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
-import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
-
 import { RegisterCommand } from '@/modules/auth/application/commands/register.command'
 import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
+import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
+import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
 
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
@@ -29,9 +28,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 			)
 		)
 
-		await this.emailConfirmationService.sendVerificationToken(
-			newUser.email
-		)
+		await this.emailConfirmationService.sendVerificationToken(newUser.email)
 
 		return {
 			message:
@@ -39,4 +36,3 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 		}
 	}
 }
-

@@ -9,7 +9,7 @@ import {
 import { v4 } from 'uuid'
 
 import { AuthMethod, UserRole } from '@/database/enums'
-import {AccountEntity} from "@/modules/auth/infrastructure/persistence/entities/account.entity";
+import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
 
 @Entity({ tableName: 'users' })
 export class UserEntity {
@@ -49,4 +49,3 @@ export class UserEntity {
 	@Property({ fieldName: 'updated_at', onUpdate: () => new Date() })
 	updatedAt: Date = new Date()
 }
-

@@ -1,11 +1,11 @@
 import { AggregateRoot } from '@nestjs/cqrs'
+
 import { UserRole } from '@/database/enums'
 
-import { UserEmail } from '../value-objects/user-email.value-object'
 import { Password } from '../value-objects/password.value-object'
+import { UserEmail } from '../value-objects/user-email.value-object'
 
 export class User extends AggregateRoot {
-
 	private constructor(
 		public readonly id: string,
 		private email: UserEmail,
@@ -155,4 +155,3 @@ export class User extends AggregateRoot {
 		return this.updatedAt
 	}
 }
-

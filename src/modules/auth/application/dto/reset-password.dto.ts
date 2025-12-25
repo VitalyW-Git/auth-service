@@ -5,4 +5,3 @@ export class ResetPasswordDto {
 	@IsNotEmpty({ message: 'Поле email не может быть пустым.' })
 	email: string
 }
-

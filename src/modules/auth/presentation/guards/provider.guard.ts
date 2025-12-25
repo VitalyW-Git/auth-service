@@ -28,4 +28,3 @@ export class AuthProviderGuard implements CanActivate {
 		return true
 	}
 }
-

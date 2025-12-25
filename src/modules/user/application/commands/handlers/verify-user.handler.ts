@@ -1,5 +1,5 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
 import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
 import { VerifyUserCommand } from '../verify-user.command'
@@ -8,7 +8,7 @@ import { VerifyUserCommand } from '../verify-user.command'
 export class VerifyUserHandler implements ICommandHandler<VerifyUserCommand> {
 	constructor(
 		@Inject('IUserRepository')
-		private readonly userRepository: IUserRepository,
+		private readonly userRepository: IUserRepository
 	) {}
 
 	async execute(command: VerifyUserCommand): Promise<void> {
@@ -23,4 +23,3 @@ export class VerifyUserHandler implements ICommandHandler<VerifyUserCommand> {
 		await this.userRepository.save(user)
 	}
 }
-

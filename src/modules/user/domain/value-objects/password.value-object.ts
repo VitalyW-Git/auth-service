@@ -20,4 +20,3 @@ export class Password {
 		return this.hashedValue === other.hashedValue
 	}
 }
-

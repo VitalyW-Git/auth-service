@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core'
 import { v4 } from 'uuid'
 
-import {UserEntity} from "@/modules/user/infrastructure/persistence/entities/user.entity";
+import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/user.entity'
 
 @Entity({ tableName: 'accounts' })
 export class AccountEntity {

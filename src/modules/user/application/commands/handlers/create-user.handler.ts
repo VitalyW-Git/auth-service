@@ -1,21 +1,20 @@
+import { ConflictException, Inject } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import {ConflictException, Inject} from '@nestjs/common'
-import { v4 } from 'uuid'
 import { hash } from 'argon2'
+import { v4 } from 'uuid'
 
 import { UserRole } from '@/database/enums'
-
-import { User } from '@/modules/user/domain/entities/user.entity'
-import { UserEmail } from '@/modules/user/domain/value-objects/user-email.value-object'
-import { Password } from '@/modules/user/domain/value-objects/password.value-object'
-import { IUserRepository } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
+import { User } from '@/modules/user/domain/entities/user.entity'
+import { IUserRepository } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
+import { Password } from '@/modules/user/domain/value-objects/password.value-object'
+import { UserEmail } from '@/modules/user/domain/value-objects/user-email.value-object'
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 	constructor(
 		@Inject('IUserRepository')
-		private readonly userRepository: IUserRepository,
+		private readonly userRepository: IUserRepository
 	) {}
 
 	async execute(command: CreateUserCommand): Promise<User> {
@@ -25,11 +24,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 		)
 
 		if (existingUser) {
-      throw new ConflictException(
-        'Регистрация не удалась. Пользователь с таким email уже существует. Пожалуйста, используйте другой email или войдите в систему.'
-      )
+			throw new ConflictException(
+				'Регистрация не удалась. Пользователь с таким email уже существует. Пожалуйста, используйте другой email или войдите в систему.'
+			)
 		}
-
 
 		const password = command.password
 			? Password.fromHashed(await hash(command.password))
@@ -48,7 +46,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 		await this.userRepository.save(user)
 
-    return user
+		return user
 	}
 }
-

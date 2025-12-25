@@ -6,4 +6,3 @@ export class NewPasswordDto {
 	@IsNotEmpty({ message: 'Поле новый пароль не может быть пустым.' })
 	password: string
 }
-

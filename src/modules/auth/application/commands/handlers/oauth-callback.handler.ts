@@ -1,16 +1,15 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
 import { AuthMethod } from '@/database/entities'
-import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
-import { GetUserQuery } from '@/modules/user/application/queries/get-user.query'
-import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
-
 import { OAuthCallbackCommand } from '@/modules/auth/application/commands/oauth-callback.command'
 import { IAccountRepository } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
 import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
+import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
+import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
+import { GetUserQuery } from '@/modules/user/application/queries/get-user.query'
 
 @CommandHandler(OAuthCallbackCommand)
 export class OAuthCallbackHandler
@@ -59,7 +58,7 @@ export class OAuthCallbackHandler
 
 		if (!account) {
 			await this.accountRepository.create(
-        newUser,
+				newUser,
 				profile.provider,
 				profile.access_token,
 				profile.refresh_token,
@@ -70,4 +69,3 @@ export class OAuthCallbackHandler
 		return this.sessionService.saveSession(command.req, newUser)
 	}
 }
-

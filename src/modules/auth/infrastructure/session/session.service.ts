@@ -31,12 +31,11 @@ export class SessionService {
 						isVerified: user.isVerified,
 						isTwoFactorEnabled: user.isTwoFactorEnabled,
 						method: user.method,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
+						createdAt: user.createdAt,
+						updatedAt: user.updatedAt
 					}
 				})
 			})
 		})
 	}
 }
-

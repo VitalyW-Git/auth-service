@@ -8,4 +8,3 @@ export type TypeUserInfo = {
 	expires_at?: number
 	provider: string
 }
-

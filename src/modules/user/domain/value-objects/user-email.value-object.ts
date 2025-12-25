@@ -21,4 +21,3 @@ export class UserEmail {
 		return this.value === other.value
 	}
 }
-

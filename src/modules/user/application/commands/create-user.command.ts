@@ -10,4 +10,3 @@ export class CreateUserCommand {
 		public readonly isVerified: boolean
 	) {}
 }
-

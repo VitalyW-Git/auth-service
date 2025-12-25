@@ -35,4 +35,3 @@ export class PasswordRecoveryController {
 		return this.passwordRecoveryService.newPassword(dto, token)
 	}
 }
-

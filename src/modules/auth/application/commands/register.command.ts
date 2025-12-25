@@ -5,4 +5,3 @@ export class RegisterCommand {
 		public readonly name: string
 	) {}
 }
-

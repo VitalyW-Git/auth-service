@@ -1,5 +1,5 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
 import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
 import { GetUserQuery, GetUserResult } from '../get-user.query'
@@ -32,4 +32,3 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
 		)
 	}
 }
-
