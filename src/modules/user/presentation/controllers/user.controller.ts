@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
-import { Authorization } from '@/auth/decorators/auth.decorator'
-import { Authorized } from '@/auth/decorators/authorized.decorator'
+import { Authorization } from '@/modules/auth/presentation/decorators/auth.decorator'
+import { Authorized } from '@/modules/auth/presentation/decorators/authorized.decorator'
 import { UserRole } from '@/database/enums'
 
 import { UpdateUserCommand } from '../../application/commands/update-user.command'

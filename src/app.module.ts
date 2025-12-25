@@ -1,10 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { AuthModule } from '@/auth/auth.module'
-import { EmailConfirmationModule } from '@/auth/email-confirmation/email-confirmation.module'
-import { PasswordRecoveryModule } from '@/auth/password-recovery/password-recovery.module'
-import { ProviderModule } from '@/auth/provider/provider.module'
-import { TwoFactorAuthModule } from '@/auth/two-factor-auth/two-factor-auth.module'
+import { AuthModule } from '@/modules/auth/auth.module'
 import { DatabaseModule } from '@/database/database.module'
 import { MailModule } from '@/libs/mail/mail.module'
 import { SessionModule } from '@/libs/session/session.module'
@@ -20,11 +16,7 @@ import { UserModule } from '@/modules/user/user.module'
 		SessionModule,
 		AuthModule,
 		UserModule,
-		ProviderModule,
-		MailModule,
-		EmailConfirmationModule,
-		PasswordRecoveryModule,
-		TwoFactorAuthModule
+		MailModule
 	]
 })
 export class AppModule {}

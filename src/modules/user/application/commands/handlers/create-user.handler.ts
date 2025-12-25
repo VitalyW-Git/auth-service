@@ -11,6 +11,7 @@ import { Password } from '../../../domain/value-objects/password.value-object'
 import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
 import { CreateUserCommand } from '../create-user.command'
 import {GetUserResult} from "@/modules/user/application/queries/get-user.query";
+import {UserInterface} from "@/modules/user/application/common/interface/user.interface";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -19,7 +20,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 		private readonly userRepository: IUserRepository,
 	) {}
 
-	async execute(command: CreateUserCommand): Promise<GetUserResult> {
+	async execute(command: CreateUserCommand): Promise<UserInterface> {
 		const email = UserEmail.create(command.email)
 		const existingUser = await this.userRepository.findByEmail(
 			email.getValue()
