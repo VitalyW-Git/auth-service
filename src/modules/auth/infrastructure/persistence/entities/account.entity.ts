@@ -4,7 +4,7 @@ import { v4 } from 'uuid'
 import {UserEntity} from "@/modules/user/infrastructure/persistence/entities/user.entity";
 
 @Entity({ tableName: 'accounts' })
-export class Account {
+export class AccountEntity {
 	@PrimaryKey({ type: 'uuid' })
 	id: string = v4()
 

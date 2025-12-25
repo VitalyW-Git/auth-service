@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { CqrsModule } from '@nestjs/cqrs'
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha'
+import { MikroOrmModule } from "@mikro-orm/nestjs";
 
 import { getProvidersConfig } from '@/config/providers.config'
 import { getRecaptchaConfig } from '@/config/recaptcha.config'
@@ -22,6 +23,7 @@ import { TwoFactorAuthService } from '@/modules/auth/infrastructure/two-factor-a
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { AccountRepository } from '@/modules/auth/infrastructure/repositories/account.repository'
 import { ProviderModule } from '@/modules/auth/infrastructure/provider/provider.module'
+import {AccountEntity} from "@/modules/auth/infrastructure/persistence/entities/account.entity";
 
 const CommandHandlers = [
 	RegisterHandler,
@@ -32,7 +34,8 @@ const CommandHandlers = [
 
 @Module({
 	imports: [
-		CqrsModule,
+    CqrsModule,
+    MikroOrmModule.forFeature([AccountEntity]),
 		DatabaseModule,
 		UserModule,
 		ProviderModule.registerAsync({

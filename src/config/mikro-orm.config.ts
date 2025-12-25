@@ -3,14 +3,16 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { Migrator } from '@mikro-orm/migrations'
 import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
-import { Account, Token } from '@/database/entities'
+import { Token } from '@/database/entities'
 import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/user.entity'
+import { AccountEntity } from "@/modules/auth/infrastructure/persistence/entities/account.entity";
+
 
 config()
 
 const getBaseConfig = (): Omit<Options<PostgreSqlDriver>, 'dbName' | 'host' | 'port' | 'user' | 'password'> => ({
 	driver: PostgreSqlDriver,
-	entities: [Account, Token, UserEntity],
+	entities: [Token, UserEntity, AccountEntity],
 	entitiesTs: [
     'src/database/entities/**/*.entity.ts',
     'src/modules/**/infrastructure/persistence/entities/**/*.entity.ts'

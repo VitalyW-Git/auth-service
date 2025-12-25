@@ -9,8 +9,7 @@ import {
 import { v4 } from 'uuid'
 
 import { AuthMethod, UserRole } from '@/database/enums'
-
-import { Account } from '@/database/entities/account.entity'
+import {AccountEntity} from "@/modules/auth/infrastructure/persistence/entities/account.entity";
 
 @Entity({ tableName: 'users' })
 export class UserEntity {
@@ -41,8 +40,8 @@ export class UserEntity {
 	@Enum(() => AuthMethod)
 	method!: AuthMethod
 
-	@OneToMany(() => Account, account => account.user)
-	accounts = new Collection<Account>(this)
+	@OneToMany(() => AccountEntity, account => account.user)
+	accounts = new Collection<AccountEntity>(this)
 
 	@Property({ fieldName: 'created_at' })
 	createdAt: Date = new Date()

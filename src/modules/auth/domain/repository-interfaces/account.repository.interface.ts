@@ -1,14 +1,14 @@
-import { Account } from '@/database/entities'
 import {User} from "@/modules/user/domain/entities/user.entity";
+import {AccountEntity} from "@/modules/auth/infrastructure/persistence/entities/account.entity";
 
 export interface IAccountRepository {
-	findByProviderId(providerId: string, provider: string): Promise<Account | null>
+	findByProviderId(providerId: string, provider: string): Promise<AccountEntity | null>
 	create(
     user: User,
 		provider: string,
 		accessToken: string,
 		refreshToken: string,
 		expiresAt: number
-	): Promise<Account>
+	): Promise<AccountEntity>
 }
 

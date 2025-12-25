@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { EntityManager } from '@mikro-orm/core'
-import { Account } from '@/database/entities'
 import { IAccountRepository } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
 import {User} from "@/modules/user/domain/entities/user.entity";
 import {UserEntity} from "@/modules/user/infrastructure/persistence/entities/user.entity";
+import {AccountEntity} from "@/modules/auth/infrastructure/persistence/entities/account.entity";
 
 @Injectable()
 export class AccountRepository implements IAccountRepository {
@@ -12,8 +12,8 @@ export class AccountRepository implements IAccountRepository {
 	public async findByProviderId(
 		providerId: string,
 		provider: string
-	): Promise<Account | null> {
-		return this.em.findOne(Account, {
+	): Promise<AccountEntity | null> {
+		return this.em.findOne(AccountEntity, {
 			id: providerId,
 			provider
 		})
@@ -25,8 +25,8 @@ export class AccountRepository implements IAccountRepository {
 		accessToken: string,
 		refreshToken: string,
 		expiresAt: number
-	): Promise<Account> {
-		const account = this.em.create(Account, {
+	): Promise<AccountEntity> {
+		const account = this.em.create(AccountEntity, {
       user: this.toEntity(user),
       type: 'oauth',
       provider,
