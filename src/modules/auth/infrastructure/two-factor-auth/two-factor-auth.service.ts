@@ -6,8 +6,9 @@ import {
 	NotFoundException
 } from '@nestjs/common'
 
-import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
+import {TokenEntity} from "@/modules/auth/infrastructure/persistence/entities/token.entity";
+import {TokenType} from "@/modules/auth/application/common/enums/token-type.enum";
 
 @Injectable()
 export class TwoFactorAuthService {
@@ -19,7 +20,7 @@ export class TwoFactorAuthService {
 	) {}
 
 	public async validateTwoFactorToken(email: string, code: string) {
-		const existingToken = await this.em.findOne(Token, {
+		const existingToken = await this.em.findOne(TokenEntity, {
 			email,
 			type: TokenType.TWO_FACTOR
 		})
@@ -68,13 +69,13 @@ export class TwoFactorAuthService {
 		return true
 	}
 
-	private async generateTwoFactorToken(email: string): Promise<Token> {
+	private async generateTwoFactorToken(email: string): Promise<TokenEntity> {
 		const token: string = Math.floor(
 			Math.random() * (1000000 - 100000) + 100000
 		).toString()
 		const expiresIn = new Date(new Date().getTime() + 300000)
 
-		const existingToken = await this.em.findOne(Token, {
+		const existingToken = await this.em.findOne(TokenEntity, {
 			email,
 			type: TokenType.TWO_FACTOR
 		})
@@ -83,7 +84,7 @@ export class TwoFactorAuthService {
 			await this.em.removeAndFlush(existingToken)
 		}
 
-		const newToken = this.em.create(Token, {
+		const newToken = this.em.create(TokenEntity, {
 			email,
 			token,
 			expiresIn,

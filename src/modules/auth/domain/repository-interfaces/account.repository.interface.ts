@@ -1,7 +1,7 @@
 import { Account } from '@/modules/auth/domain/entities/account.entity'
 import { AccountEntity } from "@/modules/auth/infrastructure/persistence/entities/account.entity";
 
-export interface IAccountRepository {
+export interface AccountRepositoryInterface {
 	findByProviderId(
 		providerId: string,
 		provider: string

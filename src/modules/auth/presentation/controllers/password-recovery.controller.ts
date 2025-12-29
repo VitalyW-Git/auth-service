@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common'
 import { Recaptcha } from '@nestlab/google-recaptcha'
 
-import { NewPasswordDto } from '../../application/dto/new-password.dto'
-import { ResetPasswordDto } from '../../application/dto/reset-password.dto'
-import { PasswordRecoveryService } from '../../infrastructure/password-recovery/password-recovery.service'
+import { NewPasswordDto } from '@/modules/auth/application/dto/new-password.dto'
+import { ResetPasswordDto } from '@/modules/auth/application/dto/reset-password.dto'
+import { PasswordRecoveryService } from '@/modules/auth/infrastructure/password-recovery/password-recovery.service'
 
 @Controller('auth/password-recovery')
 export class PasswordRecoveryController {
@@ -21,8 +21,8 @@ export class PasswordRecoveryController {
 	@Recaptcha()
 	@Post('reset')
 	@HttpCode(HttpStatus.OK)
-	public async resetPassword(@Body() dto: ResetPasswordDto) {
-		return this.passwordRecoveryService.resetPassword(dto)
+	public async resetPassword(@Body() resetPassword: ResetPasswordDto) {
+		return this.passwordRecoveryService.resetPassword(resetPassword)
 	}
 
 	@Recaptcha()

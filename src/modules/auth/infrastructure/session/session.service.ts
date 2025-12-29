@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { Request } from 'express'
 
-import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
+import { UserInterface } from '@/modules/user/application/common/interfaces/user.interface'
 
 @Injectable()
 export class SessionService {

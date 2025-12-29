@@ -2,12 +2,12 @@ import { EntityManager } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 
 import { Account } from '@/modules/auth/domain/entities/account.entity'
-import { IAccountRepository } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
+import { AccountRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
 import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
 import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/user.entity'
 
 @Injectable()
-export class AccountRepository implements IAccountRepository {
+export class AccountRepository implements AccountRepositoryInterface {
 	public constructor(private readonly em: EntityManager) {}
 
 	public async findByProviderId(

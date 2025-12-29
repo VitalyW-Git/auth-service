@@ -1,14 +1,14 @@
 import { Inject } from '@nestjs/common'
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
-import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
+import { UserRepositoryInterface } from '../../../domain/repository-interfaces/user.repository.interface'
 import { GetUserQuery, GetUserResult } from '../get-user.query'
 
 @QueryHandler(GetUserQuery)
 export class GetUserHandler implements IQueryHandler<GetUserQuery> {
 	constructor(
 		@Inject('IUserRepository')
-		private readonly userRepository: IUserRepository
+		private readonly userRepository: UserRepositoryInterface
 	) {}
 
 	async execute(query: GetUserQuery): Promise<GetUserResult> {

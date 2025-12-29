@@ -10,14 +10,15 @@ import { QueryBus } from '@nestjs/cqrs'
 import { hash } from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
-import { IUserRepository } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
+import { UserRepositoryInterface } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 import { Password } from '@/modules/user/domain/value-objects/password.value-object'
 
-import { NewPasswordDto } from '../../application/dto/new-password.dto'
-import { ResetPasswordDto } from '../../application/dto/reset-password.dto'
+import { NewPasswordDto } from '@/modules/auth/application/dto/new-password.dto'
+import { ResetPasswordDto } from '@/modules/auth/application/dto/reset-password.dto'
+import {TokenEntity} from "@/modules/auth/infrastructure/persistence/entities/token.entity";
+import {TokenType} from "@/modules/auth/application/common/enums/token-type.enum";
 
 @Injectable()
 export class PasswordRecoveryService {
@@ -27,13 +28,13 @@ export class PasswordRecoveryService {
 		private readonly em: EntityManager,
 		private readonly queryBus: QueryBus,
 		@Inject('IUserRepository')
-		private readonly userRepository: IUserRepository,
+		private readonly userRepository: UserRepositoryInterface,
 		private readonly mailService: MailService
 	) {}
 
-	public async resetPassword(dto: ResetPasswordDto) {
+	public async resetPassword(resetPassword: ResetPasswordDto) {
 		const existingUser = await this.queryBus.execute(
-			new GetUserByEmailQuery(dto.email)
+			new GetUserByEmailQuery(resetPassword.email)
 		)
 
 		if (!existingUser) {
@@ -53,7 +54,7 @@ export class PasswordRecoveryService {
 			)
 		} catch (error) {
 			this.logger.error(
-				`Не удалось отправить email для сброса пароля на ${dto.email}: ${error.message}`,
+				`Не удалось отправить email для сброса пароля на ${resetPassword.email}: ${error.message}`,
 				error.stack
 			)
 			throw error
@@ -63,7 +64,7 @@ export class PasswordRecoveryService {
 	}
 
 	public async newPassword(dto: NewPasswordDto, token: string) {
-		const existingToken = await this.em.findOne(Token, {
+		const existingToken = await this.em.findOne(TokenEntity, {
 			token,
 			type: TokenType.PASSWORD_RESET
 		})
@@ -101,11 +102,11 @@ export class PasswordRecoveryService {
 		return true
 	}
 
-	private async generatePasswordResetToken(email: string): Promise<Token> {
+	private async generatePasswordResetToken(email: string): Promise<TokenEntity> {
 		const token = uuidv4()
 		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
-		const existingToken = await this.em.findOne(Token, {
+		const existingToken = await this.em.findOne(TokenEntity, {
 			email,
 			type: TokenType.PASSWORD_RESET
 		})
@@ -114,7 +115,7 @@ export class PasswordRecoveryService {
 			await this.em.removeAndFlush(existingToken)
 		}
 
-		const newToken = this.em.create(Token, {
+		const newToken = this.em.create(TokenEntity, {
 			email,
 			token,
 			expiresIn,

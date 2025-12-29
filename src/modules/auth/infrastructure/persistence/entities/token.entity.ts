@@ -1,10 +1,10 @@
 import { Entity, Enum, PrimaryKey, Property } from '@mikro-orm/core'
 import { v4 } from 'uuid'
 
-import { TokenType } from '../enums'
+import {TokenType} from "@/modules/auth/application/common/enums/token-type.enum";
 
 @Entity({ tableName: 'tokens' })
-export class Token {
+export class TokenEntity {
 	@PrimaryKey({ type: 'uuid' })
 	id: string = v4()
 

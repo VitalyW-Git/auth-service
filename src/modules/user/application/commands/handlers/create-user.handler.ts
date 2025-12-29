@@ -3,10 +3,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { hash } from 'argon2'
 import { v4 } from 'uuid'
 
-import { UserRole } from '@/database/enums'
+import {UserRole} from "@/modules/user/application/common/enums/user-role.enum";
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
 import { User } from '@/modules/user/domain/entities/user.entity'
-import { IUserRepository } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
+import { UserRepositoryInterface } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 import { Password } from '@/modules/user/domain/value-objects/password.value-object'
 import { UserEmail } from '@/modules/user/domain/value-objects/user-email.value-object'
 
@@ -14,7 +14,7 @@ import { UserEmail } from '@/modules/user/domain/value-objects/user-email.value-
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 	constructor(
 		@Inject('IUserRepository')
-		private readonly userRepository: IUserRepository
+		private readonly userRepository: UserRepositoryInterface
 	) {}
 
 	async execute(command: CreateUserCommand): Promise<User> {

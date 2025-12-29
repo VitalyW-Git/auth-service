@@ -21,8 +21,8 @@ export class EmailConfirmationController {
 	@HttpCode(HttpStatus.OK)
 	public async newVerification(
 		@Req() req: Request,
-		@Body() dto: ConfirmationDto
+		@Body() confirmation: ConfirmationDto
 	) {
-		return this.emailConfirmationService.newVerification(req, dto)
+		return this.emailConfirmationService.newVerification(req, confirmation)
 	}
 }

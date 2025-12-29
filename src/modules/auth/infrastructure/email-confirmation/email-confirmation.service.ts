@@ -9,14 +9,15 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Token, TokenType } from '@/database/entities'
 import { MailService } from '@/libs/mail/mail.service'
 import { VerifyUserCommand } from '@/modules/user/application/commands/verify-user.command'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
 
-import { ConfirmationDto } from '../../application/dto/confirmation.dto'
-import { SessionService } from '../session/session.service'
+import { ConfirmationDto } from '@/modules/auth/application/dto/confirmation.dto'
+import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
+import {TokenEntity} from "@/modules/auth/infrastructure/persistence/entities/token.entity";
+import {TokenType} from "@/modules/auth/application/common/enums/token-type.enum";
 
 @Injectable()
 export class EmailConfirmationService {
@@ -30,9 +31,9 @@ export class EmailConfirmationService {
 		private readonly sessionService: SessionService
 	) {}
 
-	public async newVerification(req: Request, dto: ConfirmationDto) {
-		const existingToken = await this.em.findOne(Token, {
-			token: dto.token,
+	public async newVerification(req: Request, confirmation: ConfirmationDto) {
+		const existingToken = await this.em.findOne(TokenEntity, {
+			token: confirmation.token,
 			type: TokenType.VERIFICATION
 		})
 
@@ -97,10 +98,10 @@ export class EmailConfirmationService {
 		return true
 	}
 
-	private async generateVerificationToken(email: string): Promise<Token> {
+	private async generateVerificationToken(email: string): Promise<TokenEntity> {
 		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
-		const existingToken = await this.em.findOne(Token, {
+		const existingToken = await this.em.findOne(TokenEntity, {
 			email,
 			type: TokenType.VERIFICATION
 		})
@@ -109,7 +110,7 @@ export class EmailConfirmationService {
 			await this.em.removeAndFlush(existingToken)
 		}
 
-		const token = this.em.create(Token, {
+		const token = this.em.create(TokenEntity, {
 			email,
 			token: uuidv4(),
 			expiresIn,

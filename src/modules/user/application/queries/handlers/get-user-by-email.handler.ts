@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common'
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
 import { User } from '../../../domain/entities/user.entity'
-import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
+import { UserRepositoryInterface } from '../../../domain/repository-interfaces/user.repository.interface'
 import { GetUserByEmailQuery } from '../get-user-by-email.query'
 
 @QueryHandler(GetUserByEmailQuery)
@@ -11,7 +11,7 @@ export class GetUserByEmailHandler
 {
 	constructor(
 		@Inject('IUserRepository')
-		private readonly userRepository: IUserRepository
+		private readonly userRepository: UserRepositoryInterface
 	) {}
 
 	async execute(query: GetUserByEmailQuery): Promise<User | null> {

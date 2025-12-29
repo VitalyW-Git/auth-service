@@ -4,13 +4,13 @@ import { EntityRepository } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { User } from '../../domain/entities/user.entity'
-import { IUserRepository } from '../../domain/repository-interfaces/user.repository.interface'
+import { UserRepositoryInterface } from '../../domain/repository-interfaces/user.repository.interface'
 import { Password } from '../../domain/value-objects/password.value-object'
 import { UserEmail } from '../../domain/value-objects/user-email.value-object'
 import { UserEntity } from '../persistence/entities/user.entity'
 
 @Injectable()
-export class UserRepository implements IUserRepository {
+export class UserRepository implements UserRepositoryInterface {
 	constructor(
 		@InjectRepository(UserEntity)
 		private readonly ormRepo: EntityRepository<UserEntity>,

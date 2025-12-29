@@ -9,14 +9,14 @@ import {
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
-import { UserRole } from '@/database/enums'
 import { Authorization } from '@/modules/auth/presentation/decorators/auth.decorator'
 import { Authorized } from '@/modules/auth/presentation/decorators/authorized.decorator'
-import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
+import { UserInterface } from '@/modules/user/application/common/interfaces/user.interface'
 
 import { UpdateUserCommand } from '../../application/commands/update-user.command'
 import { GetUserQuery } from '../../application/queries/get-user.query'
 import { UpdateUserDto } from '../dto/update-user.dto'
+import {UserRole} from "@/modules/user/application/common/enums/user-role.enum";
 
 @Controller('users')
 export class UserController {

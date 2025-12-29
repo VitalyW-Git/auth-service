@@ -1,10 +1,10 @@
 import { Inject } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { UserInterface } from '@/modules/user/application/common/interface/user.interface'
+import { UserInterface } from '@/modules/user/application/common/interfaces/user.interface'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
 
-import { IUserRepository } from '../../../domain/repository-interfaces/user.repository.interface'
+import { UserRepositoryInterface } from '../../../domain/repository-interfaces/user.repository.interface'
 import { UserEmail } from '../../../domain/value-objects/user-email.value-object'
 import { UpdateUserCommand } from '../update-user.command'
 
@@ -12,7 +12,7 @@ import { UpdateUserCommand } from '../update-user.command'
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
 	constructor(
 		@Inject('IUserRepository')
-		private readonly userRepository: IUserRepository
+		private readonly userRepository: UserRepositoryInterface
 	) {}
 
 	async execute(command: UpdateUserCommand): Promise<UserInterface> {
