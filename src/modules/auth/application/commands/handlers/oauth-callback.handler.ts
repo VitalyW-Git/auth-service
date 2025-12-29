@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
 import { AuthMethod } from '@/database/entities'
+import { Account } from '@/modules/auth/domain/entities/account.entity'
 import { OAuthCallbackCommand } from '@/modules/auth/application/commands/oauth-callback.command'
 import { IAccountRepository } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
 import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
@@ -40,8 +41,8 @@ export class OAuthCallbackHandler
 			profile.provider
 		)
 
-		const user: UserInterface | null = account?.userId
-			? await this.queryBus.execute(new GetUserQuery(account.userId))
+		const user: UserInterface | null = account?.getUserId()
+			? await this.queryBus.execute(new GetUserQuery(account.getUserId()!))
 			: null
 
 		if (user) {
@@ -60,13 +61,17 @@ export class OAuthCallbackHandler
 		)
 
 		if (!account) {
-			await this.accountRepository.create(
-				newUser,
+			const newAccount = Account.create(
+				profile.id,
+				'oauth',
 				profile.provider,
 				profile.access_token,
 				profile.refresh_token,
-				profile.expires_at
+				profile.expires_at,
+				newUser.id
 			)
+      const accountEntity = await this.accountRepository.findById(newAccount.id)
+			await this.accountRepository.save(newAccount, accountEntity)
 		}
 
 		const userResult = new GetUserResult(

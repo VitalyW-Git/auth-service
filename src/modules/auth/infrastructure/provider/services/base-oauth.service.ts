@@ -4,8 +4,8 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 
-import { TypeBaseProviderOptions } from './types/base-provider-options.types'
-import { TypeUserInfo } from './types/user-info.types'
+import { TypeBaseProviderOptions } from '@/modules/auth/infrastructure/provider/services/types/base-provider-options.types'
+import { TypeUserInfo } from '@/modules/auth/infrastructure/provider/services/types/user-info.types'
 
 @Injectable()
 export class BaseOAuthService {
