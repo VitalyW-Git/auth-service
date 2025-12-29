@@ -1,13 +1,12 @@
 import { applyDecorators, UseGuards } from '@nestjs/common'
 
-import {UserRole} from "@/modules/user/application/common/enums/user-role.enum";
-import { AuthGuard } from '../guards/auth.guard'
-import { RolesGuard } from '../guards/roles.guard'
-
-import { Roles } from './roles.decorator'
+import { Roles } from '@/modules/auth/presentation/decorators/roles.decorator'
+import { AuthGuard } from '@/modules/auth/presentation/guards/auth.guard'
+import { RolesGuard } from '@/modules/auth/presentation/guards/roles.guard'
+import { UserRole } from '@/modules/user/application/common/enums/user-role.enum'
 
 export function Authorization(...roles: UserRole[]) {
-	if (roles.length > 0) {
+	if (!!roles?.length) {
 		return applyDecorators(
 			Roles(...roles),
 			UseGuards(AuthGuard, RolesGuard)

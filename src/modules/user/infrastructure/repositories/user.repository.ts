@@ -56,7 +56,7 @@ export class UserRepository implements UserRepositoryInterface {
 			UserEmail.create(entity.email),
 			entity.password ? Password.fromHashed(entity.password) : null,
 			entity.displayName,
-			entity.picture || null,
+			entity.picture ?? null,
 			entity.role,
 			entity.isVerified,
 			entity.isTwoFactorEnabled,
@@ -72,7 +72,7 @@ export class UserRepository implements UserRepositoryInterface {
 		entity.email = user.getEmail().getValue()
 		entity.password = user.getPassword()?.getHashedValue() || ''
 		entity.displayName = user.getDisplayName()
-		entity.picture = user.getPicture() || undefined
+		entity.picture = user.getPicture() ?? null
 		entity.role = user.getRole()
 		entity.isVerified = user.getIsVerified()
 		entity.isTwoFactorEnabled = user.getIsTwoFactorEnabled()
@@ -86,7 +86,7 @@ export class UserRepository implements UserRepositoryInterface {
 		entity.email = user.getEmail().getValue()
 		entity.password = user.getPassword()?.getHashedValue() || ''
 		entity.displayName = user.getDisplayName()
-		entity.picture = user.getPicture() || undefined
+		entity.picture = user.getPicture() ?? null
 		entity.role = user.getRole()
 		entity.isVerified = user.getIsVerified()
 		entity.isTwoFactorEnabled = user.getIsTwoFactorEnabled()

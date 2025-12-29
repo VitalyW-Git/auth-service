@@ -1,6 +1,6 @@
-import { EntityManager } from '@mikro-orm/core'
 import {
 	BadRequestException,
+	Inject,
 	Injectable,
 	Logger,
 	NotFoundException
@@ -10,21 +10,22 @@ import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { MailService } from '@/libs/mail/mail.service'
+import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { ConfirmationDto } from '@/modules/auth/application/dto/confirmation.dto'
+import { Token } from '@/modules/auth/domain/entities/token.entity'
+import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
+import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { VerifyUserCommand } from '@/modules/user/application/commands/verify-user.command'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
-
-import { ConfirmationDto } from '@/modules/auth/application/dto/confirmation.dto'
-import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
-import {TokenEntity} from "@/modules/auth/infrastructure/persistence/entities/token.entity";
-import {TokenType} from "@/modules/auth/application/common/enums/token-type.enum";
 
 @Injectable()
 export class EmailConfirmationService {
 	private readonly logger = new Logger(EmailConfirmationService.name)
 
 	public constructor(
-		private readonly em: EntityManager,
+		@Inject('TokenRepositoryInterface')
+		private readonly tokenRepository: TokenRepositoryInterface,
 		private readonly mailService: MailService,
 		private readonly queryBus: QueryBus,
 		private readonly commandBus: CommandBus,
@@ -32,10 +33,10 @@ export class EmailConfirmationService {
 	) {}
 
 	public async newVerification(req: Request, confirmation: ConfirmationDto) {
-		const existingToken = await this.em.findOne(TokenEntity, {
-			token: confirmation.token,
-			type: TokenType.VERIFICATION
-		})
+		const existingToken = await this.tokenRepository.findByTokenAndType(
+			confirmation.token,
+			TokenType.VERIFICATION
+		)
 
 		if (!existingToken) {
 			throw new NotFoundException(
@@ -43,16 +44,14 @@ export class EmailConfirmationService {
 			)
 		}
 
-		const hasExpired = new Date(existingToken.expiresIn) < new Date()
-
-		if (hasExpired) {
+		if (existingToken.isExpired()) {
 			throw new BadRequestException(
 				'Токен подтверждения истек. Пожалуйста, запросите новый токен для подтверждения.'
 			)
 		}
 
 		const existingUser = await this.queryBus.execute(
-			new GetUserByEmailQuery(existingToken.email)
+			new GetUserByEmailQuery(existingToken.getEmail())
 		)
 
 		if (!existingUser) {
@@ -62,7 +61,7 @@ export class EmailConfirmationService {
 		}
 
 		await this.commandBus.execute(new VerifyUserCommand(existingUser.id))
-		await this.em.removeAndFlush(existingToken)
+		await this.tokenRepository.delete(existingToken)
 
 		const userResult = new GetUserResult(
 			existingUser.id,
@@ -82,11 +81,10 @@ export class EmailConfirmationService {
 	public async sendVerificationToken(email: string) {
 		const verificationToken = await this.generateVerificationToken(email)
 
-		console.log(verificationToken)
 		try {
 			await this.mailService.sendConfirmationEmail(
-				verificationToken.email,
-				verificationToken.token
+				verificationToken.getEmail(),
+				verificationToken.getToken()
 			)
 		} catch (error) {
 			this.logger.error(
@@ -98,26 +96,26 @@ export class EmailConfirmationService {
 		return true
 	}
 
-	private async generateVerificationToken(email: string): Promise<TokenEntity> {
+	private async generateVerificationToken(email: string): Promise<Token> {
 		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
-		const existingToken = await this.em.findOne(TokenEntity, {
+		const existingToken = await this.tokenRepository.findByEmailAndType(
 			email,
-			type: TokenType.VERIFICATION
-		})
+			TokenType.VERIFICATION
+		)
 
 		if (existingToken) {
-			await this.em.removeAndFlush(existingToken)
+			await this.tokenRepository.delete(existingToken)
 		}
 
-		const token = this.em.create(TokenEntity, {
+		const token = Token.create(
 			email,
-			token: uuidv4(),
-			expiresIn,
-			type: TokenType.VERIFICATION
-		})
+			uuidv4(),
+			TokenType.VERIFICATION,
+			expiresIn
+		)
 
-		await this.em.persistAndFlush(token)
+		await this.tokenRepository.save(token)
 
 		return token
 	}

@@ -15,8 +15,10 @@ import { RegisterHandler } from '@/modules/auth/application/commands/handlers/re
 import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
 import { PasswordRecoveryService } from '@/modules/auth/infrastructure/password-recovery/password-recovery.service'
 import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
+import { TokenEntity } from '@/modules/auth/infrastructure/persistence/entities/token.entity'
 import { ProviderModule } from '@/modules/auth/infrastructure/provider/provider.module'
 import { AccountRepository } from '@/modules/auth/infrastructure/repositories/account.repository'
+import { TokenRepository } from '@/modules/auth/infrastructure/repositories/token.repository'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { TwoFactorAuthService } from '@/modules/auth/infrastructure/two-factor-auth/two-factor-auth.service'
 import { AuthController } from '@/modules/auth/presentation/controllers/auth.controller'
@@ -34,7 +36,7 @@ const CommandHandlers = [
 @Module({
 	imports: [
 		CqrsModule,
-		MikroOrmModule.forFeature([AccountEntity]),
+		MikroOrmModule.forFeature([AccountEntity, TokenEntity]),
 		DatabaseModule,
 		UserModule,
 		ProviderModule.registerAsync({
@@ -61,8 +63,12 @@ const CommandHandlers = [
 		SessionService,
 		MailService,
 		{
-			provide: 'IAccountRepository',
+			provide: 'AccountRepositoryInterface',
 			useClass: AccountRepository
+		},
+		{
+			provide: 'TokenRepositoryInterface',
+			useClass: TokenRepository
 		}
 	]
 })

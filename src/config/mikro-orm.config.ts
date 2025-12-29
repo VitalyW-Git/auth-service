@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
 
 import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
-import {TokenEntity} from "@/modules/auth/infrastructure/persistence/entities/token.entity";
+import { TokenEntity } from '@/modules/auth/infrastructure/persistence/entities/token.entity'
 import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/user.entity'
 
 config()

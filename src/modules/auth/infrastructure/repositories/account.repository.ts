@@ -30,13 +30,16 @@ export class AccountRepository implements AccountRepositoryInterface {
 		return this.toDomain(entity)
 	}
 
-  public findById(id: string): Promise<AccountEntity|null> {
-    return this.em.findOne(AccountEntity, {
-      id
-    })
-  }
+	public findById(id: string): Promise<AccountEntity | null> {
+		return this.em.findOne(AccountEntity, {
+			id
+		})
+	}
 
-	public async save(account: Account, accountEntity: AccountEntity = null): Promise<void> {
+	public async save(
+		account: Account,
+		accountEntity: AccountEntity = null
+	): Promise<void> {
 		if (accountEntity) {
 			this.updateEntity(accountEntity, account)
 			await this.em.flush()
@@ -84,17 +87,20 @@ export class AccountRepository implements AccountRepositoryInterface {
 	}
 
 	private updateEntity(accountEntity: AccountEntity, account: Account): void {
-    accountEntity.refreshToken = account.getRefreshToken() ?? null
-    accountEntity.accessToken = account.getAccessToken() ?? null
-    accountEntity.expiresAt = account.getExpiresAt()
-    accountEntity.updatedAt = account.getUpdatedAt()
+		accountEntity.refreshToken = account.getRefreshToken() ?? null
+		accountEntity.accessToken = account.getAccessToken() ?? null
+		accountEntity.expiresAt = account.getExpiresAt()
+		accountEntity.updatedAt = account.getUpdatedAt()
 
-		if (account.getUserId() && accountEntity.user?.id !== account.getUserId()) {
+		if (
+			account.getUserId() &&
+			accountEntity.user?.id !== account.getUserId()
+		) {
 			const userEntity = this.em.getReference(
 				UserEntity,
 				account.getUserId()!
 			)
-      accountEntity.user = userEntity
+			accountEntity.user = userEntity
 		}
 	}
 }

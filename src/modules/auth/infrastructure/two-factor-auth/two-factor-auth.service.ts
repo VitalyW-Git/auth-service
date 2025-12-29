@@ -1,29 +1,31 @@
-import { EntityManager } from '@mikro-orm/core'
 import {
 	BadRequestException,
+	Inject,
 	Injectable,
 	Logger,
 	NotFoundException
 } from '@nestjs/common'
 
 import { MailService } from '@/libs/mail/mail.service'
-import {TokenEntity} from "@/modules/auth/infrastructure/persistence/entities/token.entity";
-import {TokenType} from "@/modules/auth/application/common/enums/token-type.enum";
+import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { Token } from '@/modules/auth/domain/entities/token.entity'
+import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
 
 @Injectable()
 export class TwoFactorAuthService {
 	private readonly logger = new Logger(TwoFactorAuthService.name)
 
 	public constructor(
-		private readonly em: EntityManager,
+		@Inject('TokenRepositoryInterface')
+		private readonly tokenRepository: TokenRepositoryInterface,
 		private readonly mailService: MailService
 	) {}
 
 	public async validateTwoFactorToken(email: string, code: string) {
-		const existingToken = await this.em.findOne(TokenEntity, {
+		const existingToken = await this.tokenRepository.findByEmailAndType(
 			email,
-			type: TokenType.TWO_FACTOR
-		})
+			TokenType.TWO_FACTOR
+		)
 
 		if (!existingToken) {
 			throw new NotFoundException(
@@ -31,21 +33,13 @@ export class TwoFactorAuthService {
 			)
 		}
 
-		if (existingToken.token !== code) {
+		if (!existingToken.isValid(code)) {
 			throw new BadRequestException(
-				'Неверный код двухфакторной аутентификации. Пожалуйста, проверьте введенный код и попробуйте снова.'
+				'Неверный код двухфакторной аутентификации или токен истек. Пожалуйста, проверьте введенный код и попробуйте снова.'
 			)
 		}
 
-		const hasExpired = new Date(existingToken.expiresIn) < new Date()
-
-		if (hasExpired) {
-			throw new BadRequestException(
-				'Срок действия токена двухфакторной аутентификации истек. Пожалуйста, запросите новый токен.'
-			)
-		}
-
-		await this.em.removeAndFlush(existingToken)
+		await this.tokenRepository.delete(existingToken)
 
 		return true
 	}
@@ -55,8 +49,8 @@ export class TwoFactorAuthService {
 
 		try {
 			await this.mailService.sendTwoFactorTokenEmail(
-				twoFactorToken.email,
-				twoFactorToken.token
+				twoFactorToken.getEmail(),
+				twoFactorToken.getToken()
 			)
 		} catch (error) {
 			this.logger.error(
@@ -69,29 +63,29 @@ export class TwoFactorAuthService {
 		return true
 	}
 
-	private async generateTwoFactorToken(email: string): Promise<TokenEntity> {
+	private async generateTwoFactorToken(email: string): Promise<Token> {
 		const token: string = Math.floor(
 			Math.random() * (1000000 - 100000) + 100000
 		).toString()
 		const expiresIn = new Date(new Date().getTime() + 300000)
 
-		const existingToken = await this.em.findOne(TokenEntity, {
+		const existingToken = await this.tokenRepository.findByEmailAndType(
 			email,
-			type: TokenType.TWO_FACTOR
-		})
+			TokenType.TWO_FACTOR
+		)
 
 		if (existingToken) {
-			await this.em.removeAndFlush(existingToken)
+			await this.tokenRepository.delete(existingToken)
 		}
 
-		const newToken = this.em.create(TokenEntity, {
+		const newToken = Token.create(
 			email,
 			token,
-			expiresIn,
-			type: TokenType.TWO_FACTOR
-		})
+			TokenType.TWO_FACTOR,
+			expiresIn
+		)
 
-		await this.em.persistAndFlush(newToken)
+		await this.tokenRepository.save(newToken)
 
 		return newToken
 	}

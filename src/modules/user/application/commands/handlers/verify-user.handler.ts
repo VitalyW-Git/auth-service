@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { UserRepositoryInterface } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 import { VerifyUserCommand } from '@/modules/user/application/commands/verify-user.command'
+import { UserRepositoryInterface } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 
 @CommandHandler(VerifyUserCommand)
 export class VerifyUserHandler implements ICommandHandler<VerifyUserCommand> {
 	constructor(
-		@Inject('IUserRepository')
+		@Inject('UserRepositoryInterface')
 		private readonly userRepository: UserRepositoryInterface
 	) {}
 

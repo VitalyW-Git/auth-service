@@ -116,4 +116,3 @@ export class Account extends AggregateRoot {
 		return this.updatedAt
 	}
 }
-

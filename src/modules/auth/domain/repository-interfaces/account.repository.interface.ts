@@ -1,5 +1,5 @@
 import { Account } from '@/modules/auth/domain/entities/account.entity'
-import { AccountEntity } from "@/modules/auth/infrastructure/persistence/entities/account.entity";
+import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
 
 export interface AccountRepositoryInterface {
 	findByProviderId(
@@ -7,5 +7,5 @@ export interface AccountRepositoryInterface {
 		provider: string
 	): Promise<Account | null>
 	save(account: Account, accountEntity: AccountEntity): Promise<void>
-  findById(id: string): Promise<AccountEntity|null>
+	findById(id: string): Promise<AccountEntity | null>
 }

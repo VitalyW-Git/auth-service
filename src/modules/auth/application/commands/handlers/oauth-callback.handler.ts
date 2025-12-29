@@ -2,8 +2,9 @@ import { Inject } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
-import { Account } from '@/modules/auth/domain/entities/account.entity'
 import { OAuthCallbackCommand } from '@/modules/auth/application/commands/oauth-callback.command'
+import { AuthMethod } from '@/modules/auth/application/common/enums/auth-method.enum'
+import { Account } from '@/modules/auth/domain/entities/account.entity'
 import { AccountRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
 import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
@@ -13,14 +14,13 @@ import {
 	GetUserQuery,
 	GetUserResult
 } from '@/modules/user/application/queries/get-user.query'
-import {AuthMethod} from "@/modules/auth/application/common/enums/auth-method.enum";
 
 @CommandHandler(OAuthCallbackCommand)
 export class OAuthCallbackHandler
 	implements ICommandHandler<OAuthCallbackCommand>
 {
 	public constructor(
-		@Inject('IAccountRepository')
+		@Inject('AccountRepositoryInterface')
 		private readonly accountRepository: AccountRepositoryInterface,
 		private readonly commandBus: CommandBus,
 		private readonly queryBus: QueryBus,
@@ -42,7 +42,9 @@ export class OAuthCallbackHandler
 		)
 
 		const user: UserInterface | null = account?.getUserId()
-			? await this.queryBus.execute(new GetUserQuery(account.getUserId()!))
+			? await this.queryBus.execute(
+					new GetUserQuery(account.getUserId()!)
+				)
 			: null
 
 		if (user) {
@@ -70,7 +72,9 @@ export class OAuthCallbackHandler
 				profile.expires_at,
 				newUser.id
 			)
-      const accountEntity = await this.accountRepository.findById(newAccount.id)
+			const accountEntity = await this.accountRepository.findById(
+				newAccount.id
+			)
 			await this.accountRepository.save(newAccount, accountEntity)
 		}
 

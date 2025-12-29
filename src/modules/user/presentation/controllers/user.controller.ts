@@ -11,12 +11,11 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
 import { Authorization } from '@/modules/auth/presentation/decorators/auth.decorator'
 import { Authorized } from '@/modules/auth/presentation/decorators/authorized.decorator'
+import { UpdateUserCommand } from '@/modules/user/application/commands/update-user.command'
+import { UserRole } from '@/modules/user/application/common/enums/user-role.enum'
 import { UserInterface } from '@/modules/user/application/common/interfaces/user.interface'
-
-import { UpdateUserCommand } from '../../application/commands/update-user.command'
-import { GetUserQuery } from '../../application/queries/get-user.query'
-import { UpdateUserDto } from '../dto/update-user.dto'
-import {UserRole} from "@/modules/user/application/common/enums/user-role.enum";
+import { GetUserQuery } from '@/modules/user/application/queries/get-user.query'
+import { UpdateUserDto } from '@/modules/user/presentation/dto/update-user.dto'
 
 @Controller('users')
 export class UserController {

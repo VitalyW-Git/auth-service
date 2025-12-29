@@ -2,10 +2,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CommandBus } from '@nestjs/cqrs'
 
 import { RegisterCommand } from '@/modules/auth/application/commands/register.command'
+import { AuthMethod } from '@/modules/auth/application/common/enums/auth-method.enum'
 import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
 import { UserInterface } from '@/modules/user/application/common/interfaces/user.interface'
-import {AuthMethod} from "@/modules/auth/application/common/enums/auth-method.enum";
 
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {

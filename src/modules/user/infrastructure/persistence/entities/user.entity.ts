@@ -8,9 +8,9 @@ import {
 } from '@mikro-orm/core'
 import { v4 } from 'uuid'
 
-import {UserRole} from "@/modules/user/application/common/enums/user-role.enum";
+import { AuthMethod } from '@/modules/auth/application/common/enums/auth-method.enum'
 import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
-import {AuthMethod} from "@/modules/auth/application/common/enums/auth-method.enum";
+import { UserRole } from '@/modules/user/application/common/enums/user-role.enum'
 
 @Entity({ tableName: 'users' })
 export class UserEntity {
