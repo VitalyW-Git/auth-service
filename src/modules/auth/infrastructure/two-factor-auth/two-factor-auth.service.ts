@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 
 import { MailService } from '@/libs/mail/mail.service'
-import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { Token } from '@/modules/auth/domain/entities/token.entity'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
 

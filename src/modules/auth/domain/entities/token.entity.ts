@@ -1,7 +1,7 @@
 import { AggregateRoot } from '@nestjs/cqrs'
 import { v4 as uuidv4 } from 'uuid'
 
-import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 
 export class Token extends AggregateRoot {
 	private constructor(

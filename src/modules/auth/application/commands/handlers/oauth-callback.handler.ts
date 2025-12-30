@@ -3,13 +3,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
 import { OAuthCallbackCommand } from '@/modules/auth/application/commands/oauth-callback.command'
-import { AuthMethod } from '@/modules/auth/application/common/enums/auth-method.enum'
+import { AuthMethod } from '@/modules/auth/domain/common/enums/auth-method.enum'
 import { Account } from '@/modules/auth/domain/entities/account.entity'
 import { AccountRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
 import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
-import { UserInterface } from '@/modules/user/application/common/interfaces/user.interface'
+import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 import {
 	GetUserQuery,
 	GetUserResult
@@ -72,10 +72,10 @@ export class OAuthCallbackHandler
 				profile.expires_at,
 				newUser.id
 			)
-			const accountEntity = await this.accountRepository.findById(
+			const account = await this.accountRepository.findById(
 				newAccount.id
 			)
-			await this.accountRepository.save(newAccount, accountEntity)
+			await this.accountRepository.save(newAccount, account)
 		}
 
 		const userResult = new GetUserResult(

@@ -10,7 +10,7 @@ import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { MailService } from '@/libs/mail/mail.service'
-import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { ConfirmationDto } from '@/modules/auth/application/dto/confirmation.dto'
 import { Token } from '@/modules/auth/domain/entities/token.entity'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'

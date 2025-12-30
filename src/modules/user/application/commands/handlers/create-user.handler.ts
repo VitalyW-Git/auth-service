@@ -4,7 +4,7 @@ import { hash } from 'argon2'
 import { v4 } from 'uuid'
 
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
-import { UserRole } from '@/modules/user/application/common/enums/user-role.enum'
+import { UserRole } from '@/modules/user/domain/common/enums/user-role.enum'
 import { User } from '@/modules/user/domain/entities/user.entity'
 import { UserRepositoryInterface } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 import { Password } from '@/modules/user/domain/value-objects/password.value-object'

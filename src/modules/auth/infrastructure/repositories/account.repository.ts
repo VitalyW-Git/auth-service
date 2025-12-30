@@ -30,21 +30,27 @@ export class AccountRepository implements AccountRepositoryInterface {
 		return this.toDomain(entity)
 	}
 
-	public findById(id: string): Promise<AccountEntity | null> {
-		return this.em.findOne(AccountEntity, {
+	public async findById(id: string): Promise<Account | null> {
+    const entity = await this.em.findOne(AccountEntity, {
 			id
 		})
+    if (!entity) {
+      return null
+    }
+
+    return this.toDomain(entity)
 	}
 
 	public async save(
-		account: Account,
-		accountEntity: AccountEntity = null
+    newAccount: Account,
+		account: Account = null
 	): Promise<void> {
-		if (accountEntity) {
-			this.updateEntity(accountEntity, account)
+		if (account) {
+      const accountEntity = this.toEntity(account)
+			this.updateEntity(accountEntity, newAccount)
 			await this.em.flush()
 		} else {
-			const newEntity = this.toEntity(account)
+			const newEntity = this.toEntity(newAccount)
 			this.em.persist(newEntity)
 			await this.em.flush()
 		}
@@ -86,21 +92,21 @@ export class AccountRepository implements AccountRepositoryInterface {
 		return entity
 	}
 
-	private updateEntity(accountEntity: AccountEntity, account: Account): void {
-		accountEntity.refreshToken = account.getRefreshToken() ?? null
-		accountEntity.accessToken = account.getAccessToken() ?? null
-		accountEntity.expiresAt = account.getExpiresAt()
-		accountEntity.updatedAt = account.getUpdatedAt()
+	private updateEntity(account: AccountEntity, newAccount: Account): void {
+    account.refreshToken = newAccount.getRefreshToken() ?? null
+		account.accessToken = newAccount.getAccessToken() ?? null
+		account.expiresAt = newAccount.getExpiresAt()
+		account.updatedAt = newAccount.getUpdatedAt()
 
 		if (
-			account.getUserId() &&
-			accountEntity.user?.id !== account.getUserId()
+      newAccount.getUserId() &&
+			account.user?.id !== newAccount.getUserId()
 		) {
 			const userEntity = this.em.getReference(
 				UserEntity,
-				account.getUserId()!
+        newAccount.getUserId()!
 			)
-			accountEntity.user = userEntity
+			account.user = userEntity
 		}
 	}
 }

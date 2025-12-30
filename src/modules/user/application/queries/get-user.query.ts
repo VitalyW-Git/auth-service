@@ -1,4 +1,4 @@
-import { UserInterface } from '@/modules/user/application/common/interfaces/user.interface'
+import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 
 export class GetUserQuery {
 	constructor(public readonly userId: string) {}

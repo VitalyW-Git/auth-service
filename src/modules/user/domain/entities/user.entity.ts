@@ -1,6 +1,6 @@
 import { AggregateRoot } from '@nestjs/cqrs'
 
-import { UserRole } from '@/modules/user/application/common/enums/user-role.enum'
+import { UserRole } from '@/modules/user/domain/common/enums/user-role.enum'
 import { Password } from '@/modules/user/domain/value-objects/password.value-object'
 import { UserEmail } from '@/modules/user/domain/value-objects/user-email.value-object'
 

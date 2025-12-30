@@ -10,7 +10,7 @@ import { hash } from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
 
 import { MailService } from '@/libs/mail/mail.service'
-import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { NewPasswordDto } from '@/modules/auth/application/dto/new-password.dto'
 import { ResetPasswordDto } from '@/modules/auth/application/dto/reset-password.dto'
 import { Token } from '@/modules/auth/domain/entities/token.entity'

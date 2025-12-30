@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 
-import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { Token } from '@/modules/auth/domain/entities/token.entity'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
 import { TokenEntity } from '@/modules/auth/infrastructure/persistence/entities/token.entity'

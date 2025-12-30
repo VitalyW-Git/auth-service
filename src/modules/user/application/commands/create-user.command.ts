@@ -1,4 +1,4 @@
-import { AuthMethod } from '@/modules/auth/application/common/enums/auth-method.enum'
+import { AuthMethod } from '@/modules/auth/domain/common/enums/auth-method.enum'
 
 export class CreateUserCommand {
 	constructor(

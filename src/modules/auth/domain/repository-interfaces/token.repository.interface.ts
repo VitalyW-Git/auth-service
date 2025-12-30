@@ -1,4 +1,4 @@
-import { TokenType } from '@/modules/auth/application/common/enums/token-type.enum'
+import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { Token } from '@/modules/auth/domain/entities/token.entity'
 
 export interface TokenRepositoryInterface {
