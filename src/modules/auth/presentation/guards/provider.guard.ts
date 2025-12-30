@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 import { Request } from 'express'
 
-import { ProviderService } from '../../infrastructure/provider/provider.service'
+import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
 
 @Injectable()
 export class AuthProviderGuard implements CanActivate {

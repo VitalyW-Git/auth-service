@@ -2,7 +2,7 @@ import { InternalServerErrorException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { LogoutCommand } from '../logout.command'
+import { LogoutCommand } from '@/modules/auth/application/commands/logout.command'
 
 @CommandHandler(LogoutCommand)
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {

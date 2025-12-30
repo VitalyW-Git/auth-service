@@ -2,17 +2,14 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CommandBus } from '@nestjs/cqrs'
 
 import { RegisterCommand } from '@/modules/auth/application/commands/register.command'
+import { SendVerificationTokenCommand } from '@/modules/auth/application/commands/send-verification-token.command'
 import { AuthMethod } from '@/modules/auth/domain/common/enums/auth-method.enum'
-import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
 import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
-	public constructor(
-		private readonly commandBus: CommandBus,
-		private readonly emailConfirmationService: EmailConfirmationService
-	) {}
+	public constructor(private readonly commandBus: CommandBus) {}
 
 	public async execute(command: RegisterCommand): Promise<{
 		message: string
@@ -28,7 +25,9 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 			)
 		)
 
-		await this.emailConfirmationService.sendVerificationToken(newUser.email)
+		await this.commandBus.execute(
+			new SendVerificationTokenCommand(newUser.email)
+		)
 
 		return {
 			message:

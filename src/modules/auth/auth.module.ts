@@ -8,19 +8,23 @@ import { getProvidersConfig } from '@/config/providers.config'
 import { getRecaptchaConfig } from '@/config/recaptcha.config'
 import { DatabaseModule } from '@/database/database.module'
 import { MailService } from '@/libs/mail/mail.service'
+import { ConfirmEmailHandler } from '@/modules/auth/application/commands/handlers/confirm-email.handler'
 import { LoginHandler } from '@/modules/auth/application/commands/handlers/login.handler'
 import { LogoutHandler } from '@/modules/auth/application/commands/handlers/logout.handler'
 import { OAuthCallbackHandler } from '@/modules/auth/application/commands/handlers/oauth-callback.handler'
 import { RegisterHandler } from '@/modules/auth/application/commands/handlers/register.handler'
-import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
-import { PasswordRecoveryService } from '@/modules/auth/infrastructure/password-recovery/password-recovery.service'
+import { RequestPasswordResetHandler } from '@/modules/auth/application/commands/handlers/request-password-reset.handler'
+import { ResetPasswordHandler } from '@/modules/auth/application/commands/handlers/reset-password.handler'
+import { SendTwoFactorTokenHandler } from '@/modules/auth/application/commands/handlers/send-two-factor-token.handler'
+import { SendVerificationTokenHandler } from '@/modules/auth/application/commands/handlers/send-verification-token.handler'
+import { ValidateTwoFactorTokenHandler } from '@/modules/auth/application/commands/handlers/validate-two-factor-token.handler'
+import { TokenGenerationService } from '@/modules/auth/domain/services/token-generation.service'
 import { AccountEntity } from '@/modules/auth/infrastructure/persistence/entities/account.entity'
 import { TokenEntity } from '@/modules/auth/infrastructure/persistence/entities/token.entity'
 import { ProviderModule } from '@/modules/auth/infrastructure/provider/provider.module'
 import { AccountRepository } from '@/modules/auth/infrastructure/repositories/account.repository'
 import { TokenRepository } from '@/modules/auth/infrastructure/repositories/token.repository'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
-import { TwoFactorAuthService } from '@/modules/auth/infrastructure/two-factor-auth/two-factor-auth.service'
 import { AuthController } from '@/modules/auth/presentation/controllers/auth.controller'
 import { EmailConfirmationController } from '@/modules/auth/presentation/controllers/email-confirmation.controller'
 import { PasswordRecoveryController } from '@/modules/auth/presentation/controllers/password-recovery.controller'
@@ -30,7 +34,13 @@ const CommandHandlers = [
 	RegisterHandler,
 	LoginHandler,
 	LogoutHandler,
-	OAuthCallbackHandler
+	OAuthCallbackHandler,
+	SendVerificationTokenHandler,
+	ConfirmEmailHandler,
+	RequestPasswordResetHandler,
+	ResetPasswordHandler,
+	SendTwoFactorTokenHandler,
+	ValidateTwoFactorTokenHandler
 ]
 
 @Module({
@@ -57,9 +67,7 @@ const CommandHandlers = [
 	],
 	providers: [
 		...CommandHandlers,
-		EmailConfirmationService,
-		PasswordRecoveryService,
-		TwoFactorAuthService,
+		TokenGenerationService,
 		SessionService,
 		MailService,
 		{

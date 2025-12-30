@@ -1,12 +1,12 @@
 import { NotFoundException, UnauthorizedException } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { QueryBus } from '@nestjs/cqrs'
+import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs'
 import { verify } from 'argon2'
 
 import { LoginCommand } from '@/modules/auth/application/commands/login.command'
-import { EmailConfirmationService } from '@/modules/auth/infrastructure/email-confirmation/email-confirmation.service'
+import { SendVerificationTokenCommand } from '@/modules/auth/application/commands/send-verification-token.command'
+import { SendTwoFactorTokenCommand } from '@/modules/auth/application/commands/send-two-factor-token.command'
+import { ValidateTwoFactorTokenCommand } from '@/modules/auth/application/commands/validate-two-factor-token.command'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
-import { TwoFactorAuthService } from '@/modules/auth/infrastructure/two-factor-auth/two-factor-auth.service'
 import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
@@ -16,8 +16,7 @@ import { User } from '@/modules/user/domain/entities/user.entity'
 export class LoginHandler implements ICommandHandler<LoginCommand> {
 	public constructor(
 		private readonly queryBus: QueryBus,
-		private readonly emailConfirmationService: EmailConfirmationService,
-		private readonly twoFactorAuthService: TwoFactorAuthService,
+		private readonly commandBus: CommandBus,
 		private readonly sessionService: SessionService
 	) {}
 
@@ -45,8 +44,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 		}
 
 		if (!user.getIsVerified()) {
-			await this.emailConfirmationService.sendVerificationToken(
-				user.getEmail().getValue()
+			await this.commandBus.execute(
+				new SendVerificationTokenCommand(user.getEmail().getValue())
 			)
 			throw new UnauthorizedException(
 				'Ваш email не подтвержден. Пожалуйста, проверьте вашу почту и подтвердите адрес.'
@@ -55,8 +54,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
 		if (user.getIsTwoFactorEnabled()) {
 			if (!command.code) {
-				await this.twoFactorAuthService.sendTwoFactorToken(
-					user.getEmail().getValue()
+				await this.commandBus.execute(
+					new SendTwoFactorTokenCommand(user.getEmail().getValue())
 				)
 
 				return {
@@ -65,9 +64,11 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 				}
 			}
 
-			await this.twoFactorAuthService.validateTwoFactorToken(
-				user.getEmail().getValue(),
-				command.code
+			await this.commandBus.execute(
+				new ValidateTwoFactorTokenCommand(
+					user.getEmail().getValue(),
+					command.code
+				)
 			)
 		}
 

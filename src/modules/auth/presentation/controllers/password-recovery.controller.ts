@@ -6,23 +6,25 @@ import {
 	Param,
 	Post
 } from '@nestjs/common'
+import { CommandBus } from '@nestjs/cqrs'
 import { Recaptcha } from '@nestlab/google-recaptcha'
 
-import { NewPasswordDto } from '@/modules/auth/application/dto/new-password.dto'
-import { ResetPasswordDto } from '@/modules/auth/application/dto/reset-password.dto'
-import { PasswordRecoveryService } from '@/modules/auth/infrastructure/password-recovery/password-recovery.service'
+import { NewPasswordDto } from '@/modules/auth/presentation/dto/new-password.dto'
+import { ResetPasswordDto } from '@/modules/auth/presentation/dto/reset-password.dto'
+import { RequestPasswordResetCommand } from '@/modules/auth/application/commands/request-password-reset.command'
+import { ResetPasswordCommand } from '@/modules/auth/application/commands/reset-password.command'
 
 @Controller('auth/password-recovery')
 export class PasswordRecoveryController {
-	constructor(
-		private readonly passwordRecoveryService: PasswordRecoveryService
-	) {}
+	constructor(private readonly commandBus: CommandBus) {}
 
 	@Recaptcha()
 	@Post('reset')
 	@HttpCode(HttpStatus.OK)
 	public async resetPassword(@Body() resetPassword: ResetPasswordDto) {
-		return this.passwordRecoveryService.resetPassword(resetPassword)
+		return this.commandBus.execute(
+			new RequestPasswordResetCommand(resetPassword.email)
+		)
 	}
 
 	@Recaptcha()
@@ -32,6 +34,8 @@ export class PasswordRecoveryController {
 		@Body() dto: NewPasswordDto,
 		@Param('token') token: string
 	) {
-		return this.passwordRecoveryService.newPassword(dto, token)
+		return this.commandBus.execute(
+			new ResetPasswordCommand(token, dto.password)
+		)
 	}
 }
