@@ -1,9 +1,4 @@
-import {
-	CanActivate,
-	ExecutionContext,
-	Injectable,
-	UnauthorizedException
-} from '@nestjs/common'
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
 import { QueryBus } from '@nestjs/cqrs'
 
 import { GetUserQuery } from '@/modules/user/application/queries/get-user.query'
@@ -21,11 +16,9 @@ export class AuthGuard implements CanActivate {
 			)
 		}
 
-		const userResult = await this.queryBus.execute(
+		request.user = await this.queryBus.execute(
 			new GetUserQuery(request.session.userId)
 		)
-
-		request.user = userResult
 
 		return true
 	}

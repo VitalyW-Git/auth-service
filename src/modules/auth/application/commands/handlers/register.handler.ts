@@ -5,7 +5,7 @@ import { RegisterCommand } from '@/modules/auth/application/commands/register.co
 import { SendVerificationTokenCommand } from '@/modules/auth/application/commands/send-verification-token.command'
 import { AuthMethod } from '@/modules/auth/domain/common/enums/auth-method.enum'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
-import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
+import { User } from '@/modules/user/domain/entities/user.entity'
 
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
@@ -14,7 +14,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 	public async execute(command: RegisterCommand): Promise<{
 		message: string
 	}> {
-		const newUser: UserInterface = await this.commandBus.execute(
+		const newUser: User = await this.commandBus.execute(
 			new CreateUserCommand(
 				command.email,
 				command.password,
@@ -26,7 +26,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 		)
 
 		await this.commandBus.execute(
-			new SendVerificationTokenCommand(newUser.email)
+			new SendVerificationTokenCommand(newUser.getEmail().getValue())
 		)
 
 		return {

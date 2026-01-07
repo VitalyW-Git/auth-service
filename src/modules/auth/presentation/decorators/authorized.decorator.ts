@@ -1,9 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 
-import { UserEntity } from '@/modules/user/infrastructure/persistence/entities/user.entity'
+import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
 
 export const Authorized = createParamDecorator(
-	(data: keyof UserEntity, ctx: ExecutionContext) => {
+	(data: keyof GetUserResult, ctx: ExecutionContext) => {
 		const request = ctx.switchToHttp().getRequest()
 		const user = request.user
 

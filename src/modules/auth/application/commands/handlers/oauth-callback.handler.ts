@@ -14,6 +14,7 @@ import {
 	GetUserQuery,
 	GetUserResult
 } from '@/modules/user/application/queries/get-user.query'
+import { User } from '@/modules/user/domain/entities/user.entity'
 
 @CommandHandler(OAuthCallbackCommand)
 export class OAuthCallbackHandler
@@ -51,7 +52,7 @@ export class OAuthCallbackHandler
 			return this.sessionService.saveSession(command.req, user)
 		}
 
-		const newUser = await this.commandBus.execute(
+		const newUser: User = await this.commandBus.execute(
 			new CreateUserCommand(
 				profile.email,
 				'',
