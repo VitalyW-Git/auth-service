@@ -6,4 +6,3 @@ export class ConfirmEmailCommand {
 		public readonly req: Request
 	) {}
 }
-

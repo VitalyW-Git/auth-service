@@ -13,63 +13,45 @@ export class TokenGenerationService {
 	) {}
 
 	public async generateVerificationToken(email: string): Promise<Token> {
-		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
-		const existingToken = await this.tokenRepository.findByEmailAndType(
-			email,
-			TokenType.VERIFICATION
-		)
-		if (existingToken) {
-			await this.tokenRepository.delete(existingToken)
-		}
-		const token = Token.create(
-			email,
-			uuidv4(),
-			TokenType.VERIFICATION,
-			expiresIn
-		)
-		await this.tokenRepository.save(token)
-		return token
+		const expiresIn: Date = new Date(new Date().getTime() + 3600 * 1000)
+		return await this.getNewToken(email, TokenType.VERIFICATION, expiresIn)
 	}
 
 	public async generatePasswordResetToken(email: string): Promise<Token> {
-		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
-		const existingToken = await this.tokenRepository.findByEmailAndType(
+		const expiresIn: Date = new Date(new Date().getTime() + 3600 * 1000)
+		return await this.getNewToken(
 			email,
-			TokenType.PASSWORD_RESET
-		)
-		if (existingToken) {
-			await this.tokenRepository.delete(existingToken)
-		}
-		const newToken = Token.create(
-			email,
-			uuidv4(),
 			TokenType.PASSWORD_RESET,
 			expiresIn
 		)
-		await this.tokenRepository.save(newToken)
-		return newToken
 	}
 
 	public async generateTwoFactorToken(email: string): Promise<Token> {
 		const token: string = Math.floor(
 			Math.random() * (1000000 - 100000) + 100000
 		).toString()
-		const expiresIn = new Date(new Date().getTime() + 300000)
-		const existingToken = await this.tokenRepository.findByEmailAndType(
+		const expiresIn: Date = new Date(new Date().getTime() + 300000)
+		return await this.getNewToken(
 			email,
-			TokenType.TWO_FACTOR
+			TokenType.TWO_FACTOR,
+			expiresIn,
+			token
 		)
+	}
+
+	private async getNewToken(
+		email: string,
+		tokenType: TokenType,
+		expiresIn: Date,
+		token: string = uuidv4()
+	): Promise<Token> {
+		const existingToken: Token =
+			await this.tokenRepository.findByEmailAndType(email, tokenType)
 		if (existingToken) {
 			await this.tokenRepository.delete(existingToken)
 		}
-		const newToken = Token.create(
-			email,
-			token,
-			TokenType.TWO_FACTOR,
-			expiresIn
-		)
+		const newToken: Token = Token.create(email, token, tokenType, expiresIn)
 		await this.tokenRepository.save(newToken)
 		return newToken
 	}
 }
-

@@ -1,13 +1,9 @@
-import {
-	BadRequestException,
-	Inject,
-	NotFoundException
-} from '@nestjs/common'
+import { BadRequestException, Inject, NotFoundException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
+import { ValidateTwoFactorTokenCommand } from '@/modules/auth/application/commands/validate-two-factor-token.command'
 import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
-import { ValidateTwoFactorTokenCommand } from '@/modules/auth/application/commands/validate-two-factor-token.command'
 
 @CommandHandler(ValidateTwoFactorTokenCommand)
 export class ValidateTwoFactorTokenHandler
@@ -39,4 +35,3 @@ export class ValidateTwoFactorTokenHandler
 		return true
 	}
 }
-

@@ -1,20 +1,23 @@
+import { BadRequestException, Inject, NotFoundException } from '@nestjs/common'
 import {
-	BadRequestException,
-	Inject,
-	NotFoundException
-} from '@nestjs/common'
-import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs'
+	CommandBus,
+	CommandHandler,
+	ICommandHandler,
+	QueryBus
+} from '@nestjs/cqrs'
 
+import { ConfirmEmailCommand } from '@/modules/auth/application/commands/confirm-email.command'
 import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
-import { ConfirmEmailCommand } from '@/modules/auth/application/commands/confirm-email.command'
 import { VerifyUserCommand } from '@/modules/user/application/commands/verify-user.command'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
 
 @CommandHandler(ConfirmEmailCommand)
-export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand> {
+export class ConfirmEmailHandler
+	implements ICommandHandler<ConfirmEmailCommand>
+{
 	public constructor(
 		@Inject('TokenRepositoryInterface')
 		private readonly tokenRepository: TokenRepositoryInterface,
@@ -23,9 +26,7 @@ export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand>
 		private readonly sessionService: SessionService
 	) {}
 
-	public async execute(
-		command: ConfirmEmailCommand
-	): Promise<{ user: any }> {
+	public async execute(command: ConfirmEmailCommand): Promise<{ user: any }> {
 		const existingToken = await this.tokenRepository.findByTokenAndType(
 			command.token,
 			TokenType.VERIFICATION
@@ -65,4 +66,3 @@ export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand>
 		return this.sessionService.saveSession(command.req, userResult!)
 	}
 }
-

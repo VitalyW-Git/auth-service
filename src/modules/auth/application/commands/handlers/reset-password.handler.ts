@@ -1,20 +1,18 @@
-import {
-	BadRequestException,
-	Inject,
-	NotFoundException
-} from '@nestjs/common'
+import { BadRequestException, Inject, NotFoundException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs'
 import { hash } from 'argon2'
 
+import { ResetPasswordCommand } from '@/modules/auth/application/commands/reset-password.command'
 import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
-import { ResetPasswordCommand } from '@/modules/auth/application/commands/reset-password.command'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { UserRepositoryInterface } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 import { Password } from '@/modules/user/domain/value-objects/password.value-object'
 
 @CommandHandler(ResetPasswordCommand)
-export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand> {
+export class ResetPasswordHandler
+	implements ICommandHandler<ResetPasswordCommand>
+{
 	public constructor(
 		@Inject('TokenRepositoryInterface')
 		private readonly tokenRepository: TokenRepositoryInterface,
@@ -54,4 +52,3 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
 		return true
 	}
 }
-

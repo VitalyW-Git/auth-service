@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
 import { MailService } from '@/libs/mail/mail.service'
 import { SendVerificationTokenCommand } from '@/modules/auth/application/commands/send-verification-token.command'
+import { Token } from '@/modules/auth/domain/entities/token.entity'
 import { TokenGenerationService } from '@/modules/auth/domain/services/token-generation.service'
 
 @CommandHandler(SendVerificationTokenCommand)
@@ -16,8 +17,10 @@ export class SendVerificationTokenHandler
 		private readonly mailService: MailService
 	) {}
 
-	public async execute(command: SendVerificationTokenCommand): Promise<boolean> {
-		const verificationToken =
+	public async execute(
+		command: SendVerificationTokenCommand
+	): Promise<boolean> {
+		const verificationToken: Token =
 			await this.tokenGenerationService.generateVerificationToken(
 				command.email
 			)
@@ -35,4 +38,3 @@ export class SendVerificationTokenHandler
 		return true
 	}
 }
-

@@ -9,10 +9,10 @@ import {
 import { CommandBus } from '@nestjs/cqrs'
 import { Recaptcha } from '@nestlab/google-recaptcha'
 
-import { NewPasswordDto } from '@/modules/auth/presentation/dto/new-password.dto'
-import { ResetPasswordDto } from '@/modules/auth/presentation/dto/reset-password.dto'
 import { RequestPasswordResetCommand } from '@/modules/auth/application/commands/request-password-reset.command'
 import { ResetPasswordCommand } from '@/modules/auth/application/commands/reset-password.command'
+import { NewPasswordDto } from '@/modules/auth/presentation/dto/new-password.dto'
+import { ResetPasswordDto } from '@/modules/auth/presentation/dto/reset-password.dto'
 
 @Controller('auth/password-recovery')
 export class PasswordRecoveryController {

@@ -9,11 +9,11 @@ import { AccountRepositoryInterface } from '@/modules/auth/domain/repository-int
 import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
-import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 import {
 	GetUserQuery,
 	GetUserResult
 } from '@/modules/user/application/queries/get-user.query'
+import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 import { User } from '@/modules/user/domain/entities/user.entity'
 
 @CommandHandler(OAuthCallbackCommand)
@@ -73,9 +73,7 @@ export class OAuthCallbackHandler
 				profile.expires_at,
 				newUser.id
 			)
-			const account = await this.accountRepository.findById(
-				newAccount.id
-			)
+			const account = await this.accountRepository.findById(newAccount.id)
 			await this.accountRepository.save(newAccount, account)
 		}
 

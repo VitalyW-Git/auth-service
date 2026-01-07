@@ -2,8 +2,8 @@ import { Inject } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
 import { UpdateUserCommand } from '@/modules/user/application/commands/update-user.command'
-import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
+import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 import { UserRepositoryInterface } from '@/modules/user/domain/repository-interfaces/user.repository.interface'
 import { UserEmail } from '@/modules/user/domain/value-objects/user-email.value-object'
 

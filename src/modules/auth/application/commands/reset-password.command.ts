@@ -4,4 +4,3 @@ export class ResetPasswordCommand {
 		public readonly password: string
 	) {}
 }
-

@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+	CanActivate,
+	ExecutionContext,
+	Injectable,
+	UnauthorizedException
+} from '@nestjs/common'
 import { QueryBus } from '@nestjs/cqrs'
 
 import { GetUserQuery } from '@/modules/user/application/queries/get-user.query'

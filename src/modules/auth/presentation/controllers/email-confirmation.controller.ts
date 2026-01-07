@@ -9,8 +9,8 @@ import {
 import { CommandBus } from '@nestjs/cqrs'
 import { Request } from 'express'
 
-import { ConfirmationDto } from '@/modules/auth/presentation/dto/confirmation.dto'
 import { ConfirmEmailCommand } from '@/modules/auth/application/commands/confirm-email.command'
+import { ConfirmationDto } from '@/modules/auth/presentation/dto/confirmation.dto'
 
 @Controller('auth/email-confirmation')
 export class EmailConfirmationController {

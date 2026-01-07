@@ -4,4 +4,3 @@ export class ValidateTwoFactorTokenCommand {
 		public readonly code: string
 	) {}
 }
-

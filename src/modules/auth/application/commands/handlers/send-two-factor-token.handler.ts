@@ -16,9 +16,7 @@ export class SendTwoFactorTokenHandler
 		private readonly mailService: MailService
 	) {}
 
-	public async execute(
-		command: SendTwoFactorTokenCommand
-	): Promise<boolean> {
+	public async execute(command: SendTwoFactorTokenCommand): Promise<boolean> {
 		const twoFactorToken =
 			await this.tokenGenerationService.generateTwoFactorToken(
 				command.email
@@ -38,4 +36,3 @@ export class SendTwoFactorTokenHandler
 		return true
 	}
 }
-

@@ -48,4 +48,3 @@ export class RequestPasswordResetHandler
 		return true
 	}
 }
-

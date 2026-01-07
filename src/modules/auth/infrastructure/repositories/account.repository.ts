@@ -31,22 +31,22 @@ export class AccountRepository implements AccountRepositoryInterface {
 	}
 
 	public async findById(id: string): Promise<Account | null> {
-    const entity = await this.em.findOne(AccountEntity, {
+		const entity = await this.em.findOne(AccountEntity, {
 			id
 		})
-    if (!entity) {
-      return null
-    }
+		if (!entity) {
+			return null
+		}
 
-    return this.toDomain(entity)
+		return this.toDomain(entity)
 	}
 
 	public async save(
-    newAccount: Account,
+		newAccount: Account,
 		account: Account = null
 	): Promise<void> {
 		if (account) {
-      const accountEntity = this.toEntity(account)
+			const accountEntity = this.toEntity(account)
 			this.updateEntity(accountEntity, newAccount)
 			await this.em.flush()
 		} else {
@@ -93,18 +93,18 @@ export class AccountRepository implements AccountRepositoryInterface {
 	}
 
 	private updateEntity(account: AccountEntity, newAccount: Account): void {
-    account.refreshToken = newAccount.getRefreshToken() ?? null
+		account.refreshToken = newAccount.getRefreshToken() ?? null
 		account.accessToken = newAccount.getAccessToken() ?? null
 		account.expiresAt = newAccount.getExpiresAt()
 		account.updatedAt = newAccount.getUpdatedAt()
 
 		if (
-      newAccount.getUserId() &&
+			newAccount.getUserId() &&
 			account.user?.id !== newAccount.getUserId()
 		) {
 			const userEntity = this.em.getReference(
 				UserEntity,
-        newAccount.getUserId()!
+				newAccount.getUserId()!
 			)
 			account.user = userEntity
 		}
