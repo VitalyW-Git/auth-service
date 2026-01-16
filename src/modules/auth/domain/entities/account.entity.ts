@@ -1,4 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs'
+import { v4 } from 'uuid'
 
 export class Account extends AggregateRoot {
 	private constructor(
@@ -26,7 +27,7 @@ export class Account extends AggregateRoot {
 	): Account {
 		const now = new Date()
 		return new Account(
-			id,
+      	id ?? v4(),
 			type,
 			provider,
 			refreshToken,
