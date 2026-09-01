@@ -42,3 +42,4 @@ base/postgres/data/*
 # Claude Code — конфигурация вынесена в ../claude-config (симлинки)
 /CLAUDE.md
 /.claude/
+/taskDocs
