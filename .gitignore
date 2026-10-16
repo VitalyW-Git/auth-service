@@ -45,5 +45,3 @@ base/postgres/data/*
 /CLAUDE.md
 /.claude/
 /taskDocs
-
-docs/*
