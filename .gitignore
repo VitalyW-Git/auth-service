@@ -38,3 +38,10 @@ base/postgres/data/*
 !base/postgres/data/.gitkeep
 .idea
 .env
+
+/ENV_VARIABLES.md
+
+# Claude Code — конфигурация вынесена в ../claude-config (симлинки)
+/CLAUDE.md
+/.claude/
+/taskDocs
