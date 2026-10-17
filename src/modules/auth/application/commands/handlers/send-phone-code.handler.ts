@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
 import { SendPhoneCodeCommand } from '@/modules/auth/application/commands/send-phone-code.command'
+import { SendPhoneCodeResult } from '@/modules/auth/application/commands/send-phone-code.result'
 import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
 import { SmsSenderInterface } from '@/modules/auth/domain/common/interfaces/sms-sender.interface'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
@@ -20,16 +21,34 @@ export class SendPhoneCodeHandler
 		private readonly tokenGenerationService: TokenGenerationService
 	) {}
 
-	public async execute(command: SendPhoneCodeCommand): Promise<boolean> {
+	public async execute(
+		command: SendPhoneCodeCommand
+	): Promise<SendPhoneCodeResult> {
 		await this.assertCanResend(command.phone)
 		const code = await this.tokenGenerationService.generatePhoneCode(
 			command.phone
 		)
-		await this.smsSender.send(
+		await this.sendOrDiscard(
 			command.phone,
 			`Код для входа: ${code}. Никому его не сообщайте.`
 		)
-		return true
+		return { isTestMode: this.smsSender.isTestMode() }
+	}
+
+	// Неотправленный код удаляется, иначе повторный запрос упрётся в паузу 60 с.
+	private async sendOrDiscard(phone: string, text: string): Promise<void> {
+		try {
+			await this.smsSender.send(phone, text)
+		} catch (error) {
+			const token = await this.tokenRepository.findByPhoneAndType(
+				phone,
+				TokenType.PHONE_VERIFICATION
+			)
+			if (token) {
+				await this.tokenRepository.delete(token)
+			}
+			throw error
+		}
 	}
 
 	private async assertCanResend(phone: string): Promise<void> {

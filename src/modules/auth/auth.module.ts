@@ -28,7 +28,7 @@ import { AccountRepository } from '@/modules/auth/infrastructure/repositories/ac
 import { TokenRepository } from '@/modules/auth/infrastructure/repositories/token.repository'
 import { HmacTokenHasher } from '@/modules/auth/infrastructure/security/hmac-token-hasher'
 import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
-import { LogSmsSender } from '@/modules/auth/infrastructure/sms/log-sms-sender'
+import { createSmsSender } from '@/modules/auth/infrastructure/sms/create-sms-sender'
 import { AuthController } from '@/modules/auth/presentation/controllers/auth.controller'
 import { EmailConfirmationController } from '@/modules/auth/presentation/controllers/email-confirmation.controller'
 import { PasswordRecoveryController } from '@/modules/auth/presentation/controllers/password-recovery.controller'
@@ -92,7 +92,8 @@ const CommandHandlers = [
 		},
 		{
 			provide: 'SmsSenderInterface',
-			useClass: LogSmsSender
+			useFactory: createSmsSender,
+			inject: [ConfigService]
 		}
 	]
 })

@@ -12,6 +12,7 @@ import { Request } from 'express'
 
 import { LoginByPhoneCommand } from '@/modules/auth/application/commands/login-by-phone.command'
 import { SendPhoneCodeCommand } from '@/modules/auth/application/commands/send-phone-code.command'
+import { SendPhoneCodeResult } from '@/modules/auth/application/commands/send-phone-code.result'
 import { PhoneLoginDto } from '@/modules/auth/presentation/dto/phone-login.dto'
 import { SendPhoneCodeDto } from '@/modules/auth/presentation/dto/send-phone-code.dto'
 
@@ -24,7 +25,9 @@ export class PhoneLoginController {
 	@Recaptcha()
 	@Post('code')
 	@HttpCode(HttpStatus.OK)
-	public async sendCode(@Body() dto: SendPhoneCodeDto): Promise<boolean> {
+	public async sendCode(
+		@Body() dto: SendPhoneCodeDto
+	): Promise<SendPhoneCodeResult> {
 		return this.commandBus.execute(new SendPhoneCodeCommand(dto.phone))
 	}
 

@@ -31,6 +31,7 @@
 | [0010](adr/0010-clinic-services-naming.md) | Таблица услуг называется `clinic_services` |
 | [0011](adr/0011-phone-signup-funnel.md) | Воронка записи по телефону: аккаунт создаётся кодом из SMS |
 | [0012](adr/0012-user-name-optional.md) | `users.name` вместо `display_name`, имя необязательно |
+| [0013](adr/0013-sms-ru-provider.md) | SMS.ru — провайдер SMS, тестовый режим только в разработке |
 
 Новый ADR: следующий номер, имя `NNNN-kebab-case.md`, структура — как в [`adr/template.md`](adr/template.md).
 
