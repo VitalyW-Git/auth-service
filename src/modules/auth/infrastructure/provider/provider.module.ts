@@ -17,9 +17,13 @@ export class ProviderModule {
 					useValue: options.services,
 					provide: ProviderOptionsSymbol
 				},
-				ProviderService
+				ProviderService,
+				{
+					provide: 'ProviderServiceInterface',
+					useExisting: ProviderService
+				}
 			],
-			exports: [ProviderService]
+			exports: ['ProviderServiceInterface']
 		}
 	}
 
@@ -33,9 +37,13 @@ export class ProviderModule {
 					provide: ProviderOptionsSymbol,
 					inject: options.inject
 				},
-				ProviderService
+				ProviderService,
+				{
+					provide: 'ProviderServiceInterface',
+					useExisting: ProviderService
+				}
 			],
-			exports: [ProviderService]
+			exports: ['ProviderServiceInterface']
 		}
 	}
 }

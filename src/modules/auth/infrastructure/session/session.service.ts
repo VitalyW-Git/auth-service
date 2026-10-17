@@ -8,12 +8,13 @@ import { Request } from 'express'
 import IORedis from 'ioredis'
 
 import { REDIS_CLIENT } from '@/libs/session/session.module'
+import { SessionServiceInterface } from '@/modules/auth/domain/common/interfaces/session-service.interface'
 import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 
 const SCAN_BATCH_SIZE = 100
 
 @Injectable()
-export class SessionService {
+export class SessionService implements SessionServiceInterface {
 	public constructor(
 		@Inject(REDIS_CLIENT) private readonly redis: IORedis,
 		private readonly configService: ConfigService

@@ -3,10 +3,10 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
 import { ResetPasswordCommand } from '@/modules/auth/application/commands/reset-password.command'
 import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
+import { SessionServiceInterface } from '@/modules/auth/domain/common/interfaces/session-service.interface'
 import { TokenHasherInterface } from '@/modules/auth/domain/common/interfaces/token-hasher.interface'
 import { Token } from '@/modules/auth/domain/entities/token.entity'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
-import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { UpdateUserPasswordCommand } from '@/modules/user/application/commands/update-user-password.command'
 
 @CommandHandler(ResetPasswordCommand)
@@ -19,7 +19,8 @@ export class ResetPasswordHandler
 		@Inject('TokenHasherInterface')
 		private readonly tokenHasher: TokenHasherInterface,
 		private readonly commandBus: CommandBus,
-		private readonly sessionService: SessionService
+		@Inject('SessionServiceInterface')
+		private readonly sessionService: SessionServiceInterface
 	) {}
 
 	public async execute(command: ResetPasswordCommand): Promise<boolean> {

@@ -76,8 +76,11 @@ const CommandHandlers = [
 	providers: [
 		...CommandHandlers,
 		TokenGenerationService,
-		SessionService,
 		MailService,
+		{
+			provide: 'SessionServiceInterface',
+			useClass: SessionService
+		},
 		{
 			provide: 'AccountRepositoryInterface',
 			useClass: AccountRepository

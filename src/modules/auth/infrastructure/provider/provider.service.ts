@@ -1,10 +1,12 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common'
 
+import { OAuthProviderInterface } from '@/modules/auth/domain/common/interfaces/oauth-provider.interface'
+import { ProviderServiceInterface } from '@/modules/auth/domain/common/interfaces/provider-service.interface'
+
 import { ProviderOptionsSymbol, TypeOptions } from './provider.constants'
-import { BaseOAuthService } from './services/base-oauth.service'
 
 @Injectable()
-export class ProviderService implements OnModuleInit {
+export class ProviderService implements OnModuleInit, ProviderServiceInterface {
 	public constructor(
 		@Inject(ProviderOptionsSymbol) private readonly options: TypeOptions
 	) {}
@@ -15,7 +17,7 @@ export class ProviderService implements OnModuleInit {
 		}
 	}
 
-	public findByService(service: string): BaseOAuthService | null {
+	public findByService(service: string): OAuthProviderInterface | null {
 		return this.options.services.find(s => s.name === service) ?? null
 	}
 }

@@ -1,16 +1,20 @@
 import {
 	CanActivate,
 	ExecutionContext,
+	Inject,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
 import { Request } from 'express'
 
-import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
+import { ProviderServiceInterface } from '@/modules/auth/domain/common/interfaces/provider-service.interface'
 
 @Injectable()
 export class AuthProviderGuard implements CanActivate {
-	public constructor(private readonly providerService: ProviderService) {}
+	public constructor(
+		@Inject('ProviderServiceInterface')
+		private readonly providerService: ProviderServiceInterface
+	) {}
 
 	public canActivate(context: ExecutionContext) {
 		const request = context.switchToHttp().getRequest() as Request

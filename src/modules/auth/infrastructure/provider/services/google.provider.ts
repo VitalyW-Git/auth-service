@@ -1,6 +1,7 @@
+import { OAuthUserInfoInterface } from '@/modules/auth/domain/common/interfaces/oauth-user-info.interface'
+
 import { BaseOAuthService } from './base-oauth.service'
 import { TypeProviderOptions } from './types/provider-options.types'
-import { TypeUserInfo } from './types/user-info.types'
 
 export class GoogleProvider extends BaseOAuthService {
 	public constructor(options: TypeProviderOptions) {
@@ -15,7 +16,9 @@ export class GoogleProvider extends BaseOAuthService {
 		})
 	}
 
-	public async extractUserInfo(data: GoogleProfile): Promise<TypeUserInfo> {
+	public async extractUserInfo(
+		data: GoogleProfile
+	): Promise<OAuthUserInfoInterface> {
 		return super.extractUserInfo({
 			email: data.email,
 			name: data.name,

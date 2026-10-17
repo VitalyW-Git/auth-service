@@ -4,23 +4,26 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 
+import { OAuthProviderInterface } from '@/modules/auth/domain/common/interfaces/oauth-provider.interface'
+import { OAuthUserInfoInterface } from '@/modules/auth/domain/common/interfaces/oauth-user-info.interface'
 import { TypeBaseProviderOptions } from '@/modules/auth/infrastructure/provider/services/types/base-provider-options.types'
-import { TypeUserInfo } from '@/modules/auth/infrastructure/provider/services/types/user-info.types'
 
 @Injectable()
-export class BaseOAuthService {
+export class BaseOAuthService implements OAuthProviderInterface {
 	private BASE_URL: string
 
 	public constructor(private readonly options: TypeBaseProviderOptions) {}
 
-	protected async extractUserInfo(data: any): Promise<TypeUserInfo> {
+	protected async extractUserInfo(
+		data: any
+	): Promise<OAuthUserInfoInterface> {
 		return {
 			...data,
 			provider: this.options.name
 		}
 	}
 
-	public getAuthUrl() {
+	public getAuthUrl(): string {
 		const query = new URLSearchParams({
 			response_type: 'code',
 			client_id: this.options.client_id,
@@ -33,7 +36,7 @@ export class BaseOAuthService {
 		return `${this.options.authorize_url}?${query}`
 	}
 
-	public async findUserByCode(code: string): Promise<TypeUserInfo> {
+	public async findUserByCode(code: string): Promise<OAuthUserInfoInterface> {
 		const client_id = this.options.client_id
 		const client_secret = this.options.client_secret
 

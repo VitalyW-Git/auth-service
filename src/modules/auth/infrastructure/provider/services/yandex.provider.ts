@@ -1,6 +1,7 @@
+import { OAuthUserInfoInterface } from '@/modules/auth/domain/common/interfaces/oauth-user-info.interface'
+
 import { BaseOAuthService } from './base-oauth.service'
 import { TypeProviderOptions } from './types/provider-options.types'
-import { TypeUserInfo } from './types/user-info.types'
 
 export class YandexProvider extends BaseOAuthService {
 	public constructor(options: TypeProviderOptions) {
@@ -15,7 +16,9 @@ export class YandexProvider extends BaseOAuthService {
 		})
 	}
 
-	public async extractUserInfo(data: YandexProfile): Promise<TypeUserInfo> {
+	public async extractUserInfo(
+		data: YandexProfile
+	): Promise<OAuthUserInfoInterface> {
 		return super.extractUserInfo({
 			email: data.emails[0],
 			name: data.display_name,

@@ -3,10 +3,10 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
 import { LoginByPhoneCommand } from '@/modules/auth/application/commands/login-by-phone.command'
 import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
+import { SessionServiceInterface } from '@/modules/auth/domain/common/interfaces/session-service.interface'
 import { TokenHasherInterface } from '@/modules/auth/domain/common/interfaces/token-hasher.interface'
 import { Token } from '@/modules/auth/domain/entities/token.entity'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
-import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { FindOrCreateUserByPhoneCommand } from '@/modules/user/application/commands/find-or-create-user-by-phone.command'
 import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
 
@@ -21,7 +21,8 @@ export class LoginByPhoneHandler
 		@Inject('TokenHasherInterface')
 		private readonly tokenHasher: TokenHasherInterface,
 		private readonly commandBus: CommandBus,
-		private readonly sessionService: SessionService
+		@Inject('SessionServiceInterface')
+		private readonly sessionService: SessionServiceInterface
 	) {}
 
 	public async execute(

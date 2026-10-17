@@ -4,10 +4,10 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 
 import { OAuthCallbackCommand } from '@/modules/auth/application/commands/oauth-callback.command'
 import { AuthMethod } from '@/modules/auth/domain/common/enums/auth-method.enum'
+import { ProviderServiceInterface } from '@/modules/auth/domain/common/interfaces/provider-service.interface'
+import { SessionServiceInterface } from '@/modules/auth/domain/common/interfaces/session-service.interface'
 import { Account } from '@/modules/auth/domain/entities/account.entity'
 import { AccountRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/account.repository.interface'
-import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
-import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command'
 import {
 	GetUserQuery,
@@ -25,8 +25,10 @@ export class OAuthCallbackHandler
 		private readonly accountRepository: AccountRepositoryInterface,
 		private readonly commandBus: CommandBus,
 		private readonly queryBus: QueryBus,
-		private readonly providerService: ProviderService,
-		private readonly sessionService: SessionService
+		@Inject('ProviderServiceInterface')
+		private readonly providerService: ProviderServiceInterface,
+		@Inject('SessionServiceInterface')
+		private readonly sessionService: SessionServiceInterface
 	) {}
 
 	public async execute(

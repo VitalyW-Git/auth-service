@@ -5,6 +5,7 @@ import {
 	Get,
 	HttpCode,
 	HttpStatus,
+	Inject,
 	Param,
 	Post,
 	Query,
@@ -21,7 +22,7 @@ import { LoginCommand } from '@/modules/auth/application/commands/login.command'
 import { LogoutCommand } from '@/modules/auth/application/commands/logout.command'
 import { OAuthCallbackCommand } from '@/modules/auth/application/commands/oauth-callback.command'
 import { RegisterCommand } from '@/modules/auth/application/commands/register.command'
-import { ProviderService } from '@/modules/auth/infrastructure/provider/provider.service'
+import { ProviderServiceInterface } from '@/modules/auth/domain/common/interfaces/provider-service.interface'
 import { LoginDto } from '@/modules/auth/presentation/dto/login.dto'
 import { RegisterDto } from '@/modules/auth/presentation/dto/register.dto'
 import { AuthProviderGuard } from '@/modules/auth/presentation/guards/provider.guard'
@@ -31,7 +32,8 @@ export class AuthController {
 	public constructor(
 		private readonly commandBus: CommandBus,
 		private readonly configService: ConfigService,
-		private readonly providerService: ProviderService
+		@Inject('ProviderServiceInterface')
+		private readonly providerService: ProviderServiceInterface
 	) {}
 
 	@Recaptcha()

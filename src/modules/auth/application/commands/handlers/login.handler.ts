@@ -1,4 +1,8 @@
-import { NotFoundException, UnauthorizedException } from '@nestjs/common'
+import {
+	Inject,
+	NotFoundException,
+	UnauthorizedException
+} from '@nestjs/common'
 import {
 	CommandBus,
 	CommandHandler,
@@ -11,7 +15,7 @@ import { LoginCommand } from '@/modules/auth/application/commands/login.command'
 import { SendTwoFactorTokenCommand } from '@/modules/auth/application/commands/send-two-factor-token.command'
 import { SendVerificationTokenCommand } from '@/modules/auth/application/commands/send-verification-token.command'
 import { ValidateTwoFactorTokenCommand } from '@/modules/auth/application/commands/validate-two-factor-token.command'
-import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
+import { SessionServiceInterface } from '@/modules/auth/domain/common/interfaces/session-service.interface'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
 import { UserInterface } from '@/modules/user/domain/common/interfaces/user.interface'
@@ -22,7 +26,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 	public constructor(
 		private readonly queryBus: QueryBus,
 		private readonly commandBus: CommandBus,
-		private readonly sessionService: SessionService
+		@Inject('SessionServiceInterface')
+		private readonly sessionService: SessionServiceInterface
 	) {}
 
 	public async execute(

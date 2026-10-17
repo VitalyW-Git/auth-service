@@ -8,9 +8,9 @@ import {
 
 import { ConfirmEmailCommand } from '@/modules/auth/application/commands/confirm-email.command'
 import { TokenType } from '@/modules/auth/domain/common/enums/token-type.enum'
+import { SessionServiceInterface } from '@/modules/auth/domain/common/interfaces/session-service.interface'
 import { TokenHasherInterface } from '@/modules/auth/domain/common/interfaces/token-hasher.interface'
 import { TokenRepositoryInterface } from '@/modules/auth/domain/repository-interfaces/token.repository.interface'
-import { SessionService } from '@/modules/auth/infrastructure/session/session.service'
 import { VerifyUserCommand } from '@/modules/user/application/commands/verify-user.command'
 import { GetUserByEmailQuery } from '@/modules/user/application/queries/get-user-by-email.query'
 import { GetUserResult } from '@/modules/user/application/queries/get-user.query'
@@ -26,7 +26,8 @@ export class ConfirmEmailHandler
 		private readonly tokenHasher: TokenHasherInterface,
 		private readonly queryBus: QueryBus,
 		private readonly commandBus: CommandBus,
-		private readonly sessionService: SessionService
+		@Inject('SessionServiceInterface')
+		private readonly sessionService: SessionServiceInterface
 	) {}
 
 	public async execute(command: ConfirmEmailCommand): Promise<{ user: any }> {

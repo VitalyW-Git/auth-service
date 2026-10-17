@@ -27,7 +27,7 @@ export class Account extends AggregateRoot {
 	): Account {
 		const now = new Date()
 		return new Account(
-      	id ?? v4(),
+			id ?? v4(),
 			type,
 			provider,
 			refreshToken,

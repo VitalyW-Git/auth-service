@@ -32,6 +32,7 @@
 | [0011](adr/0011-phone-signup-funnel.md) | Воронка записи по телефону: аккаунт создаётся кодом из SMS |
 | [0012](adr/0012-user-name-optional.md) | `users.name` вместо `display_name`, имя необязательно |
 | [0013](adr/0013-sms-ru-provider.md) | SMS.ru — провайдер SMS, тестовый режим только в разработке |
+| [0014](adr/0014-session-provider-ports.md) | Сессия и OAuth-провайдер за доменными портами (DI-токены) |
 
 Новый ADR: следующий номер, имя `NNNN-kebab-case.md`, структура — как в [`adr/template.md`](adr/template.md).
 
