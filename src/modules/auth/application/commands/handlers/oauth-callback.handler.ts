@@ -75,8 +75,7 @@ export class OAuthCallbackHandler
 				profile.expires_at,
 				newUser.id
 			)
-			const account = await this.accountRepository.findById(newAccount.id)
-			await this.accountRepository.save(newAccount, account)
+			await this.accountRepository.save(newAccount)
 		}
 
 		const userResult = GetUserResult.fromUser(newUser)

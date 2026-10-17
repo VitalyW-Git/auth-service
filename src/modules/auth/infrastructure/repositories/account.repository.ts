@@ -30,24 +30,15 @@ export class AccountRepository implements AccountRepositoryInterface {
 		return this.toDomain(entity)
 	}
 
-	public async findById(id: string): Promise<Account | null> {
+	public async save(newAccount: Account): Promise<void> {
+		// Грузим управляемую сущность и мутируем её: flush по новому, неуправляемому
+		// экземпляру не эмитит UPDATE, и обновление токенов терялось бы.
 		const entity = await this.em.findOne(AccountEntity, {
-			id
+			id: newAccount.id
 		})
-		if (!entity) {
-			return null
-		}
 
-		return this.toDomain(entity)
-	}
-
-	public async save(
-		newAccount: Account,
-		account: Account = null
-	): Promise<void> {
-		if (account) {
-			const accountEntity = this.toEntity(account)
-			this.updateEntity(accountEntity, newAccount)
+		if (entity) {
+			this.updateEntity(entity, newAccount)
 			await this.em.flush()
 		} else {
 			const newEntity = this.toEntity(newAccount)
