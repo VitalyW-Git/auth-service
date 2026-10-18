@@ -58,11 +58,10 @@ RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 
 # SMS.ru (вход по телефону, docs/adr/0013). Без SMS_RU_API_ID текст SMS пишется в лог (только в development)
 SMS_RU_API_ID=your-sms-ru-api-id
-# Тестовый режим test=1: SMS не уходит, баланс не списывается, текст в логе.
-# По умолчанию true в development и false иначе; true вне development — ошибка при старте
 SMS_RU_TEST_MODE=true
-# Имя отправителя, согласованное в SMS.ru; пусто — отправитель по умолчанию
 SMS_RU_SENDER=
+# Только для разработки: базовый адрес API вместо https://sms.ru.
+SMS_RU_API_URL=
 ```
 
 ## Важные замечания

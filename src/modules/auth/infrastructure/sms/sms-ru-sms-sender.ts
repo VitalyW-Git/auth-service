@@ -9,15 +9,15 @@ import { ConfigService } from '@nestjs/config'
 
 import { isDev } from '@/libs/common/utils/is-dev.util'
 import { SmsSenderInterface } from '@/modules/auth/domain/common/interfaces/sms-sender.interface'
+import { SmsRuSendResponseInterface } from '@/modules/auth/infrastructure/sms/interfaces/sms-ru-send-response.interface'
 
-import { SmsRuSendResponseInterface } from './interfaces/sms-ru-send-response.interface'
-
-const SMS_RU_SEND_URL = 'https://sms.ru/sms/send'
-const REQUEST_TIMEOUT_MS = 10000
-// Номер не принимает SMS: неверный, нет маршрута, зарубежный при настройке «только РФ».
-const INVALID_PHONE_CODES = [202, 207, 214]
-// Лимиты SMS.ru на один номер (защита от накрутки кодов).
-const PHONE_LIMIT_CODES = [230, 231, 232, 233]
+import {
+	SMS_RU_BASE_URL,
+	SMS_RU_INVALID_PHONE_CODES,
+	SMS_RU_PHONE_LIMIT_CODES,
+	SMS_RU_REQUEST_TIMEOUT_MS,
+	SMS_RU_SEND_PATH
+} from './constants/sms-ru.constants'
 
 /**
  * Отправка через SMS.ru (https://sms.ru/api/send). В тестовом режиме (test=1) SMS.ru проверяет запрос
@@ -29,6 +29,7 @@ export class SmsRuSmsSender implements SmsSenderInterface {
 	private readonly apiId: string
 	private readonly sender: string | undefined
 	private readonly testMode: boolean
+	private readonly sendUrl: string
 
 	public constructor(configService: ConfigService) {
 		const isDevelopment = isDev(configService)
@@ -44,6 +45,7 @@ export class SmsRuSmsSender implements SmsSenderInterface {
 				'SMS_RU_TEST_MODE=true допустим только при NODE_ENV=development: в тестовом режиме коды не доходят до пользователей.'
 			)
 		}
+		this.sendUrl = this.resolveSendUrl(configService, isDevelopment)
 	}
 
 	public isTestMode(): boolean {
@@ -61,15 +63,39 @@ export class SmsRuSmsSender implements SmsSenderInterface {
 		}
 	}
 
+	/**
+	 * Адрес API: SMS_RU_API_URL подменяет https://sms.ru локальной заглушкой (tools/sms-ru-mock.mjs).
+	 * Нужно, пока у аккаунта нет согласованного буквенного отправителя — тогда настоящий SMS.ru
+	 * отвечает 221 на любой запрос, включая test=1. Подмена разрешена только при NODE_ENV=development.
+	 */
+	private resolveSendUrl(
+		configService: ConfigService,
+		isDevelopment: boolean
+	): string {
+		const baseUrl = configService.get<string>('SMS_RU_API_URL')
+		if (!baseUrl) {
+			return `${SMS_RU_BASE_URL}${SMS_RU_SEND_PATH}`
+		}
+		if (!isDevelopment) {
+			throw new Error(
+				'SMS_RU_API_URL допустим только при NODE_ENV=development: вне разработки SMS должны уходить через sms.ru.'
+			)
+		}
+		this.logger.warn(
+			`Запросы идут на заглушку ${baseUrl}, а не в SMS.ru: SMS никому не доставляются.`
+		)
+		return `${baseUrl.replace(/\/+$/, '')}${SMS_RU_SEND_PATH}`
+	}
+
 	private async requestSend(
 		recipient: string,
 		text: string
 	): Promise<SmsRuSendResponseInterface> {
 		try {
-			const response = await fetch(SMS_RU_SEND_URL, {
+			const response = await fetch(this.sendUrl, {
 				method: 'POST',
 				body: this.buildBody(recipient, text),
-				signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+				signal: AbortSignal.timeout(SMS_RU_REQUEST_TIMEOUT_MS)
 			})
 			return (await response.json()) as SmsRuSendResponseInterface
 		} catch (error) {
@@ -114,12 +140,12 @@ export class SmsRuSmsSender implements SmsSenderInterface {
 	}
 
 	private toHttpException(statusCode: number): HttpException {
-		if (INVALID_PHONE_CODES.includes(statusCode)) {
+		if (SMS_RU_INVALID_PHONE_CODES.includes(statusCode)) {
 			return new BadRequestException(
 				'На этот номер не удаётся отправить SMS. Проверьте номер.'
 			)
 		}
-		if (PHONE_LIMIT_CODES.includes(statusCode)) {
+		if (SMS_RU_PHONE_LIMIT_CODES.includes(statusCode)) {
 			return new HttpException(
 				'Слишком много SMS на этот номер. Попробуйте позже.',
 				HttpStatus.TOO_MANY_REQUESTS
